@@ -342,3 +342,11 @@ input[type="file"] {
         margin-top: -60px;
     }
 }
+
+#capture-btn {
+  background-color: var(--indigo-dark) !important;
+}
+
+#capture-btn:hover {
+  background-color: var(--indigo-darker) !important;
+}

@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Close mobile menu when clicking outside
   document.addEventListener("click", function (e) {
-    if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+    if (
+      !mobileMenu.contains(e.target) &&
+      !mobileMenuButton.contains(e.target)
+    ) {
       mobileMenu.classList.add("hidden");
       mobileMenuButton.setAttribute("aria-expanded", "false");
     }
@@ -50,7 +53,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const detectedItems = document.getElementById("detected-items");
   const findProductsBtn = document.getElementById("find-products-btn");
   const resultsSection = document.getElementById("results-section");
-  const recommendationsSection = document.getElementById("recommendations-section");
+  const recommendationsSection = document.getElementById(
+    "recommendations-section"
+  );
 
   // Handle drag and drop
   uploadContainer.addEventListener("dragover", (e) => {
@@ -105,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.className =
         "fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4";
       modal.innerHTML = `
-        <div class="bg-white rounded-lg p-4 max-w-md w-full">
+        <div class="rounded-lg p-4 max-w-md w-full" style="background-color:rgb(241, 236, 210)";>
           <h3 class="text-xl font-bold mb-4 text-gray-800">Take a Photo</h3>
           <div id="camera-view">
             <video id="camera-feed" autoplay playsinline class="w-full mb-4 rounded-lg border border-gray-200"></video>
@@ -391,11 +396,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
   const navbar = document.querySelector(".glass-navbar");
-  
+
   // Apply glass effect immediately
-  navbar.style.backdropFilter = 'blur(12px) saturate(160%)';
-  navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
-  navbar.style.webkitBackdropFilter = 'blur(12px) saturate(160%)';
+  navbar.style.backdropFilter = "blur(12px) saturate(160%)";
+  navbar.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
+  navbar.style.webkitBackdropFilter = "blur(12px) saturate(160%)";
 
   // Dynamic light follow (mouse tracking)
   document.addEventListener("mousemove", (e) => {
