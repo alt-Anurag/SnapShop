@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapShop - Visual Shopping Assistant</title>
+    <!-- Tailwind CSS with all variants enabled -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script>
+        tailwind.config = {
+            important: true,
+            darkMode: 'class',
+            corePlugins: {
+                preflight: true,
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-cream font-poppins" style="padding-top: 70px;">
+    <!-- Navbar -->
+    <nav class="glass-navbar fixed w-full z-50 top-0 left-0 right-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="font-semibold text-indigo-dark text-xl">SnapShop</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="border-teal text-gray-900 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Home</a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">My Finds</a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Trending</a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-indigo-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-user mr-1"></i> Log In
+                    </a>
+                    <a href="#" class="bg-indigo-dark text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-darker flex items-center">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Sign Up
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-indigo-dark hover:text-indigo-darker focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden sm:hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="bg-teal-50 border-teal text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
+                <a href="#" class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">My Finds</a>
+                <a href="#" class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Trending</a>
+                <div class="border-t border-gray-200 pt-4 pb-3">
+                    <div class="space-y-1">
+                        <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-user mr-2"></i> Log In
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Sign Up
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="md:hidden h-[70px]"></div>
+        <div class="container mx-auto px-4 pt-24 pb-12">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-indigo-dark mb-4">Discover Products With Just a Snap</h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Upload a photo or a video to find similar items and
+                    get
+                    personalized
+                    recommendations tailored to your preferences.</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden p-6 mb-12">
+                <div class="text-center">
+                    <div id="upload-container"
+                        class="border-2 border-dashed border-teal-light rounded-xl p-12 cursor-pointer hover:border-teal transition duration-300 bg-teal-50">
+                        <i class="fas fa-camera text-5xl text-teal mb-4"></i>
+                        <h3 class="text-xl font-medium text-indigo-dark mb-2">Drag & Drop your image here</h3>
+                        <p class="text-gray-500 mb-4">or</p>
+                        <button id="browse-btn"
+                            class="bg-indigo-dark text-white px-6 py-3 rounded-lg hover:bg-indigo-darker transition duration-300 font-medium shadow-md">
+                            <i class="fas fa-folder-open mr-2"></i>Browse Files
+                        </button>
+                        <label for="file-input" class="sr-only">Upload an image</label>
+                        <input type="file" id="file-input" accept="image/*" class="hidden" title="Upload an image">
+                    </div>
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <button id="camera-btn"
+                            class="flex items-center text-indigo-dark px-4 py-2 rounded-lg border border-teal-light hover:bg-teal-50 transition duration-300 shadow-sm">
+                            <i class="fas fa-camera mr-2"></i> Use Camera
+                        </button>
+                        <button id="sample-btn"
+                            class="flex items-center text-indigo-dark px-4 py-2 rounded-lg border border-teal-light hover:bg-teal-50 transition duration-300 shadow-sm">
+                            <i class="fas fa-image mr-2"></i> Try Sample
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Section (Initially Hidden) -->
+            <div id="preview-section" class="max-w-3xl mx-auto hidden">
+                <div class="flex flex-col md:flex-row gap-6 mb-8">
+                    <div class="w-full md:w-1/2 bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-4 bg-teal-50 border-b border-teal-light">
+                            <h3 class="font-medium text-indigo-dark">Your Image</h3>
+                        </div>
+                        <div class="p-4">
+                            <img id="preview-image" src="" alt="Preview" class="w-full h-auto rounded-lg shadow-sm">
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-4 bg-teal-50 border-b border-teal-light">
+                            <h3 class="font-medium text-indigo-dark">Detected Items</h3>
+                        </div>
+                        <div id="detected-items" class="p-4">
+                            <div class="animate-pulse">
+                                <div class="h-4 bg-teal-light rounded w-3/4 mb-2"></div>
+                                <div class="h-4 bg-teal-light rounded w-1/2 mb-2"></div>
+                                <div class="h-4 bg-teal-light rounded w-2/3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="find-products-btn"
+                    class="w-full bg-indigo-dark text-white px-6 py-4 rounded-xl hover:bg-indigo-darker transition duration-300 font-medium shadow-lg">
+                    <i class="fas fa-search mr-2"></i>Find Matching Products
+                </button>
+            </div>
+
+            <!-- Results Section (Initially Hidden) -->
+            <div id="results-section" class="hidden mt-16">
+                <h2 class="text-3xl font-bold text-indigo-dark mb-8 text-center">Recommended For You</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Product cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Recommendations Section (Initially Hidden) -->
+            <div id="recommendations-section" class="hidden mt-16">
+                <h2 class="text-3xl font-bold text-indigo-dark mb-8 text-center">Complete Your Look</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Recommendation cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <span class="font-bold text-2xl">SnapShop</span>
+                    <p class="text-teal-light mt-2">Visual shopping powered by AI</p>
+                </div>
+                <div class="flex space-x-6 mb-6 md:mb-0">
+                    <a href="#" class="text-teal-light hover:text-white text-xl" title="Twitter"><i
+                            class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-teal-light hover:text-white text-xl" title="Instagram"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="mailto:anuragjha7516@gmail.com" class="text-teal-light hover:text-white text-xl"
+                        title="Email"><i class="fab fa-google"></i></a>
+                    <a href="#" class="text-teal-light hover:text-white text-xl" title="GitHub"><i
+                            class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-teal-light mt-8 pt-8 text-sm text-teal-light text-center">
+                <p>© 2025 SnapShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
