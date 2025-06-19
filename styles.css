@@ -235,7 +235,7 @@ input[type="file"] {
   body {
     padding-top: 60px;
   }
-  
+
   .glass-navbar {
     backdrop-filter: blur(8px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(160%) !important;
@@ -284,63 +284,63 @@ input[type="file"] {
 
 /* Camera Modal Styles */
 .fixed {
-    position: fixed;
+  position: fixed;
 }
 
 .inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .z-50 {
-    z-index: 50;
+  z-index: 50;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 /* Transition effects */
 .transition {
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 /* Button hover states */
 .bg-indigo-600:hover {
-    background-color: #4f46e5;
+  background-color: #4f46e5;
 }
 
 .bg-gray-500:hover {
-    background-color: #6b7280;
+  background-color: #6b7280;
 }
 
 .bg-green-500:hover {
-    background-color: #10b981;
+  background-color: #10b981;
 }
 
 /* Navbar Buttons */
 .nav-button {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .nav-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(95, 93, 156, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(95, 93, 156, 0.15);
 }
 
 /* Ensure mobile menu is visible when toggled */
 .mobile-menu:not(.hidden) {
-    display: block;
+  display: block;
 }
 
 /* Fix for navbar covering content */
 @media (max-width: 768px) {
-    .hero-section {
-        padding-top: 60px;
-        margin-top: -60px;
-    }
+  .hero-section {
+    padding-top: 60px;
+    margin-top: -60px;
+  }
 }
 
 #capture-btn {
