@@ -27,7 +27,7 @@ def describe_image(image_data):
 
         # Generate description
         response = model.generate_content(
-            ["Describe this image in exactly one line at the top. And then using numbered bullet points, focus on products, clothes, objects and their colors, styles and distinct characteristics (if any) that would be relevant for shopping in the frame. The bullet points should be crisp and short. Use clear formatting. Use **bold** only for category labels (like **Clothes:**). Do not use markdown for anything else.", img_part]
+            ["Describe this image in exactly one line at the top. And then using numbered bullet points, focus on products, clothes, objects and their colors, styles and distinct characteristics (if any) that would be relevant for shopping in the frame. The bullet points should be crisp and short. Do not use markdown for anything.", img_part]
         )
         return response.text
     
