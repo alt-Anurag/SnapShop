@@ -350,3 +350,27 @@ input[type="file"] {
 #capture-btn:hover {
   background-color: var(--indigo-darker) !important;
 }
+
+/* Loading animation enhancements */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+.text-teal-light {
+  color: var(--teal-light);
+}
+
+/* Error states */
+.text-red-500 {
+  color: #ef4444;
+}
+

@@ -57,6 +57,9 @@ document.addEventListener("DOMContentLoaded", function () {
     "recommendations-section"
   );
 
+  // API Configuration
+  const API_ENDPOINT = "/.netlify/functions/describe-image";
+
   // Handle drag and drop
   uploadContainer.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -216,12 +219,44 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Sample button
-  sampleBtn.addEventListener("click", () => {
+  sampleBtn.addEventListener("click", async () => {
     // Use a sample image for demo
     previewImage.src =
       "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
     showPreview();
-    simulateDetection();
+
+    // Show loading state
+    detectedItems.innerHTML = `
+      <div class="space-y-3 text-center py-4">
+        <div class="animate-pulse flex flex-col items-center">
+          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+          <p class="text-teal font-medium">Analyzing sample image...</p>
+          <p class="text-teal-light">Please wait while we process the image</p>
+        </div>
+      </div>
+    `;
+
+    try {
+      // Fetch the sample image
+      const response = await fetch(previewImage.src);
+      const blob = await response.blob();
+      const reader = new FileReader();
+
+      reader.onload = async function () {
+        const base64Image = reader.result.split(",")[1];
+        const description = await getImageDescription(base64Image);
+        displayDescription(description);
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error("Error with sample image:", error);
+      detectedItems.innerHTML = `
+        <div class="text-red-500 text-center py-4">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          Failed to analyze sample image. Please try again.
+        </div>
+      `;
+    }
   });
 
   // Find products button
@@ -244,19 +279,104 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Handle image upload
-  function handleImageUpload(file) {
+  async function handleImageUpload(file) {
     if (!file.type.match("image.*")) {
       alert("Please select an image file");
       return;
     }
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       previewImage.src = e.target.result;
       showPreview();
-      simulateDetection();
+
+      // Show loading state
+      detectedItems.innerHTML = `
+        <div class="space-y-3 text-center py-4">
+          <div class="animate-pulse flex flex-col items-center">
+            <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+            <p class="text-teal font-medium">Analyzing image...</p>
+            <p class="text-teal-light">Please wait while we process your image</p>
+          </div>
+        </div>
+      `;
+
+      try {
+        // Convert image to base64
+        const base64Image = e.target.result.split(",")[1];
+
+        // Call the API
+        const description = await getImageDescription(base64Image);
+
+        // Display the description
+        displayDescription(description);
+      } catch (error) {
+        console.error("Error:", error);
+        detectedItems.innerHTML = `
+          <div class="text-red-500 text-center py-4">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            Failed to analyze image. Please try again.
+          </div>
+        `;
+      }
     };
     reader.readAsDataURL(file);
+  }
+
+  // SINGLE VERSION OF THIS FUNCTION - ALL OTHERS REMOVED
+  async function getImageDescription(base64Image) {
+    try {
+      // First update to "Describing image..."
+      detectedItems.innerHTML = `
+        <div class="space-y-3 text-center py-4">
+          <div class="animate-pulse flex flex-col items-center">
+            <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+            <p class="text-teal font-medium">Describing image...</p>
+            <p class="text-teal-light">Almost done!</p>
+          </div>
+        </div>
+      `;
+
+      const response = await fetch(API_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: base64Image }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.description || "No description available";
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }
+
+  // Display the description
+  function displayDescription(description) {
+    // Split the description into bullet points if it contains newlines
+    const descriptionPoints = description.split('\n').filter(point => point.trim() !== '');
+    
+    // Create HTML for the description
+    let descriptionHTML = '<div class="space-y-3">';
+    
+    descriptionPoints.forEach(point => {
+      descriptionHTML += `
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full bg-teal mr-2 flex-shrink-0"></div>
+          <span class="font-medium text-indigo-dark">${point}</span>
+        </div>
+      `;
+    });
+    
+    descriptionHTML += '</div>';
+    
+    detectedItems.innerHTML = descriptionHTML;
   }
 
   // Show preview section
@@ -264,26 +384,6 @@ document.addEventListener("DOMContentLoaded", function () {
     uploadContainer.classList.add("hidden");
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
-  }
-
-  // Simulate image detection (will be replaced with actual API call)
-  function simulateDetection() {
-    detectedItems.innerHTML = `
-      <div class="space-y-3">
-        <div class="flex items-center">
-          <div class="w-3 h-3 rounded-full bg-teal mr-2"></div>
-          <span class="font-medium text-indigo-dark">Black Blazer (92%)</span>
-        </div>
-        <div class="flex items-center">
-          <div class="w-3 h-3 rounded-full bg-teal mr-2"></div>
-          <span class="font-medium text-indigo-dark">Grey Pleated Dress Pants (77%)</span>
-        </div>
-        <div class="flex items-center">
-          <div class="w-3 h-3 rounded-full bg-teal mr-2"></div>
-          <span class="font-medium text-indigo-dark">Brown Leather Shoes (89%)</span>
-        </div>
-      </div>
-    `;
   }
 
   // Show results (simulated)
