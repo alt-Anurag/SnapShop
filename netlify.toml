@@ -23,3 +23,7 @@ publishOrigin = "default"
 [build.processing.js]
 
 [build.services]
+
+[build]
+  functions = "netlify/functions"
+  publish = "."
