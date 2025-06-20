@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("load", () => {
     if (window.innerWidth < 768) {
       setTimeout(() => {
-        window.scrollTo(0, 0);
         document.querySelector(".hero-section")?.scrollIntoView(true);
       }, 100);
     }
@@ -90,9 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Universal mobile layout enforcer
   function enforceMobileLayout() {
     if (window.innerWidth < 768) {
-      // Reset scroll position on mobile
-      window.scrollTo(0, 0);
-
       // Calculate required spacing
       const navbarHeight = document.querySelector(".glass-navbar").offsetHeight;
       document.querySelector(
@@ -360,12 +356,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Display the description
   function displayDescription(description) {
     // Split the description into bullet points if it contains newlines
-    const descriptionPoints = description.split('\n').filter(point => point.trim() !== '');
-    
+    const descriptionPoints = description
+      .split("\n")
+      .filter((point) => point.trim() !== "");
+
     // Create HTML for the description
     let descriptionHTML = '<div class="space-y-3">';
-    
-    descriptionPoints.forEach(point => {
+
+    descriptionPoints.forEach((point) => {
       descriptionHTML += `
         <div class="flex items-center">
           <div class="w-3 h-3 rounded-full bg-teal mr-2 flex-shrink-0"></div>
@@ -373,9 +371,9 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       `;
     });
-    
-    descriptionHTML += '</div>';
-    
+
+    descriptionHTML += "</div>";
+
     detectedItems.innerHTML = descriptionHTML;
   }
 
