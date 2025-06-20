@@ -13,10 +13,10 @@ CORS(app)  # Add this line right after
 genai.configure(api_key="AIzaSyAkWLp68hygPw0vLO14O1YYcPzSN49EHco")
 
 def describe_image(image_data):
-    """Takes base64 image data and returns a description using Gemini 1.5 Flash"""
+    """Takes base64 image data and returns a description using Gemini 2.5 Flash"""
     try:
         # Initialize the model
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Prepare image
         img_bytes = base64.b64decode(image_data)
