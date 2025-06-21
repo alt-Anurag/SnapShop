@@ -10,7 +10,7 @@ exports.handler = async (event) => {
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-vision" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const { image } = JSON.parse(event.body);
     if (!image) throw new Error("No image data received");
