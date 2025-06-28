@@ -120,7 +120,7 @@ Netlify Function (already preloaded)
           v
 3. Frontend Displays Recommendations
 
----
+```
 
 
 # Performance Optimization: Solving the Cold Start Problem
