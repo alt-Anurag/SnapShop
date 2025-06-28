@@ -325,50 +325,68 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ UPDATED: Create product card helper function with enhanced "Click to Buy" button
+  // ✅ Create product card helper function
   function createProductCard(product) {
     const productCard = document.createElement("div");
+    // Added shadows and transitions for a better look
     productCard.className =
       "product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 fade-in";
 
-    // Handle product URL properly
     let productUrl = "#";
     if (product.URL) {
       try {
-        // If it's already a full URL, use it as is
         productUrl = new URL(product.URL).href;
       } catch (e) {
-        // If it's not a full URL, try to make it one
+        // More robust URL handling
         if (product.URL.startsWith("www.")) {
           productUrl = `https://${product.URL}`;
         } else if (product.URL.startsWith("http")) {
           productUrl = product.URL;
         } else {
+          // Fallback for cases like "myntra.com/..."
           productUrl = `https://${product.URL}`;
         }
       }
     }
 
     productCard.innerHTML = `
-            <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                <img src="${product.Image || "/api/placeholder/300/300"}" 
-                     alt="${product.Product || "Product"}" 
-                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                     onerror="this.src='/api/placeholder/300/300'">
-            </div>
-            <div class="p-4">
-                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${
-                  product.Product || "Product"
-                }</h3>
-                <p class="text-xl font-bold text-teal mb-3">₹${
-                  product.Price || "N/A"
-                }</p>
-                <a href="${productUrl}" target="_blank" 
-                   class="block w-full bg-gradient-to-r from-teal to-teal-dark text-white text-center py-3 px-4 rounded-lg font-medium hover:from-teal-dark hover:to-teal transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg">
-                    🛒 Click to Buy
-                </a>
-            </div>
-        `;
+        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+            <img src="${product.Image || "/api/placeholder/300/300"}" 
+                 alt="${product.Product || "Product"}" 
+                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                 onerror="this.src='/api/placeholder/300/300'">
+        </div>
+        <div class="p-4">
+            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${
+              product.Product || "Product"
+            }</h3>
+            <p class="text-xl font-bold text-teal mb-3">₹${
+              product.Price || "N/A"
+            }</p>
+            
+            <!-- ✅ FIXED: Button with inline styles to prevent CSS purging -->
+            <a href="${productUrl}" 
+               target="_blank" 
+               style="
+                  display: block;
+                  width: 100%;
+                  background: linear-gradient(to right, #14B8A6, #0D9488); /* Teal gradient */
+                  color: white;
+                  text-align: center;
+                  padding: 0.75rem 1rem;
+                  border-radius: 0.5rem;
+                  font-weight: 500;
+                  text-decoration: none;
+                  transition: all 0.2s ease-in-out;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+               "
+               onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)';"
+               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)';"
+            >
+                🛒 Click to Buy
+            </a>
+        </div>
+    `;
     return productCard;
   }
 
