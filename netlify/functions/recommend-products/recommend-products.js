@@ -4,21 +4,21 @@ import { createClient } from "@supabase/supabase-js";
 import { HfInference } from "@huggingface/inference";
 import fetch from "node-fetch";
 
-// Supabase client
+// ✅ Supabase client with environment variable
 const supabase = createClient(
   "https://jsnbscsxsqrrdgllgttw.supabase.co",
-  "process.env.SUPABASE_ANON_KEY"
+  process.env.SUPABASE_ANON_KEY
 );
 
-// Hugging Face
+// Hugging Face client
 const hf = new HfInference(process.env.HF_API_TOKEN);
 
-// Helper to upload image to Supabase bucket
+// Upload image to Supabase bucket
 async function uploadToBucket(fileBuffer, fileName) {
   const { data, error } = await supabase.storage
-    .from("uploads") // your bucket name
+    .from("uploads") // your public bucket name
     .upload(`user_uploads/${fileName}`, fileBuffer, {
-      contentType: "image/jpeg", // adjust if needed
+      contentType: "image/jpeg",
       upsert: true,
     });
 
@@ -32,6 +32,8 @@ async function uploadToBucket(fileBuffer, fileName) {
 }
 
 export const handler = async (event) => {
+  console.log("🔑 Supabase Key Length:", process.env.SUPABASE_ANON_KEY?.length); // Debug log
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -45,33 +47,34 @@ export const handler = async (event) => {
     }
 
     const body = JSON.parse(event.body);
-    const base64Image = body.imageBase64; // Expecting base64 string from frontend
+    const base64Image = body.imageBase64;
     if (!base64Image) throw new Error("No image provided");
 
-    // Convert base64 to Buffer
+    // Convert base64 to buffer
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
 
-    // Upload image to Supabase and get public URL
+    // Upload to Supabase → get public URL
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // Download image from Supabase (public URL)
+    // Fetch image back (as Hugging Face expects remote file input)
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(
         `Failed to fetch uploaded image: ${imageResponse.statusText}`
       );
     }
+
     const arrayBuffer = await imageResponse.arrayBuffer();
     const imageInput = Buffer.from(arrayBuffer);
 
-    // Hugging Face inference
+    // Get embedding from Hugging Face
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
       inputs: imageInput,
     });
 
-    // Supabase RPC call
+    // Call Supabase RPC
     const { data, error: rpcError } = await supabase.rpc("similar_products", {
       query_embedding: embedding,
       match_threshold: 0.25,
@@ -84,7 +87,7 @@ export const handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         products: data || [],
-        imageUrl: imageUrl,
+        imageUrl,
         message: "Recommendations retrieved",
       }),
     };
