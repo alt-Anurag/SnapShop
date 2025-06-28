@@ -396,18 +396,17 @@ document.addEventListener("DOMContentLoaded", function () {
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
   }
-
-  // Show results - UPDATED VERSION
+  // Show results - UPDATED VERSION with better error handling
   async function showResults() {
     const resultsContainer = resultsSection.querySelector(".grid");
     resultsContainer.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <div class="animate-pulse flex flex-col items-center">
-          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-          <p class="text-teal font-medium">Finding matching products...</p>
-        </div>
+    <div class="col-span-full text-center py-8">
+      <div class="animate-pulse flex flex-col items-center">
+        <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+        <p class="text-teal font-medium">Finding matching products...</p>
       </div>
-    `;
+    </div>
+  `;
 
     resultsSection.classList.remove("hidden");
 
@@ -422,19 +421,28 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error ||
+            errorData.message ||
+            `API request failed with status ${response.status}`
+        );
       }
 
-      const { products } = await response.json();
+      const { products, error: apiError } = await response.json();
+
+      if (apiError) {
+        throw new Error(apiError);
+      }
 
       if (!products || products.length === 0) {
         resultsContainer.innerHTML = `
-          <div class="col-span-full text-center py-8">
-            <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
-            <p class="text-teal font-medium">No matching products found</p>
-            <p class="text-teal-light">Try uploading a different image</p>
-          </div>
-        `;
+        <div class="col-span-full text-center py-8">
+          <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
+          <p class="text-teal font-medium">No matching products found</p>
+          <p class="text-teal-light">Try uploading a different image</p>
+        </div>
+      `;
         return;
       }
 
@@ -447,36 +455,51 @@ document.addEventListener("DOMContentLoaded", function () {
         const productCard = document.createElement("div");
         productCard.className =
           "product-card bg-white rounded-xl overflow-hidden fade-in";
+
+        // Create product URL with fallback
+        let productUrl = "#";
+        if (product.URL) {
+          productUrl = product.URL.startsWith("http")
+            ? product.URL
+            : `https://${product.URL}`;
+        }
+
         productCard.innerHTML = `
-          <img src="${
-            product.Image ||
-            "https://via.placeholder.com/300x300?text=Product+Image"
-          }" 
-               alt="${product.Product}" 
-               class="w-full h-60 object-cover"
-               onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
-          <div class="p-4">
-            <h3 class="font-medium text-indigo-dark mb-1">${
-              product.Product || "Product"
-            }</h3>
-            <p class="text-teal font-semibold mb-3">₹${
-              product.Price || "N/A"
-            }</p>
-            <a href="${
-              product.URL || "#"
-            }" target="_blank" class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
-              <i class="fas fa-shopping-cart mr-2"></i>View Product
-            </a>
-          </div>
-        `;
+        <img src="${
+          product.Image ||
+          "https://via.placeholder.com/300x300?text=Product+Image"
+        }" 
+             alt="${product.Product || "Product"}" 
+             class="w-full h-60 object-cover"
+             onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
+        <div class="p-4">
+          <h3 class="font-medium text-indigo-dark mb-1">${
+            product.Product || "Product"
+          }</h3>
+          <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
+          <a href="${productUrl}" 
+             target="_blank" 
+             class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
+            <i class="fas fa-shopping-cart mr-2"></i>View Product
+          </a>
+        </div>
+      `;
         resultsContainer.appendChild(productCard);
       });
     } catch (error) {
       console.error("Error showing results:", error);
+      resultsContainer.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
+        <p class="text-red-500 font-medium">Failed to load products</p>
+        <p class="text-teal-light">${
+          error.message || "Please try again later"
+        }</p>
+      </div>
+    `;
       throw error; // Rethrow to be caught by the parent function
     }
   }
-
   // Show recommendations - UPDATED VERSION
   async function showRecommendations() {
     const recommendationsContainer =

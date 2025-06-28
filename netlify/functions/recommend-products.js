@@ -1,6 +1,5 @@
 // netlify/functions/recommend-products.js
 const { createClient } = require("@supabase/supabase-js");
-const fetch = require("node-fetch");
 
 // Initialize Supabase client
 const supabaseUrl = "https://jsnbscsxsqrrdgllgttw.supabase.co";
@@ -13,8 +12,21 @@ const HF_CLIP_API =
   "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
 const HF_TOKEN = "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"; // Get this from your Hugging Face account
 
-async function getImageEmbedding(imageUrl) {
+exports.handler = async (event) => {
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Method Not Allowed" }),
+    };
+  }
+
   try {
+    const { imageUrl } = JSON.parse(event.body);
+    if (!imageUrl) {
+      throw new Error("No image URL provided");
+    }
+
+    // Use the built-in fetch (available in Netlify Functions environment)
     // First download the image
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
@@ -33,30 +45,7 @@ async function getImageEmbedding(imageUrl) {
       throw new Error(`Hugging Face API error: ${response.statusText}`);
     }
 
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Error getting image embedding:", error);
-    throw error;
-  }
-}
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" }),
-    };
-  }
-
-  try {
-    const { imageUrl } = JSON.parse(event.body);
-    if (!imageUrl) {
-      throw new Error("No image URL provided");
-    }
-
-    // Get CLIP embedding from Hugging Face
-    const embedding = await getImageEmbedding(imageUrl);
+    const embedding = await response.json();
 
     // Query similar products from Supabase
     const { data, error } = await supabase.rpc("similar_products", {
