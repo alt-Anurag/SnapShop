@@ -4,21 +4,16 @@ import base64
 import re
 from io import BytesIO
 from PIL import Image
-from flask_cors import CORS  # Add at top
+from flask_cors import CORS  
 
 app = Flask(__name__)
-CORS(app)  # Add this line right after
-
-# Configure with your API key - REPLACE WITH YOUR ACTUAL API KEY
+CORS(app) 
 genai.configure(api_key="AIzaSyAkWLp68hygPw0vLO14O1YYcPzSN49EHco")
-
 def describe_image(image_data):
-    """Takes base64 image data and returns a description using Gemini 2.5 Flash"""
+    
     try:
-        # Initialize the model
-        model = genai.GenerativeModel('gemini-2.5-flash')
         
-        # Prepare image
+        model = genai.GenerativeModel('gemini-2.5-flash')
         img_bytes = base64.b64decode(image_data)
         img_part = {
             "mime_type": "image/jpeg", 

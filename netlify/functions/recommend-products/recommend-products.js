@@ -1,18 +1,13 @@
-// netlify/functions/recommend-products.js
-
 import { createClient } from "@supabase/supabase-js";
 import fetch from "node-fetch";
 
-// ✅ Supabase client
 const supabase = createClient(
   "https://jsnbscsxsqrrdgllgttw.supabase.co",
   process.env.SUPABASE_ANON_KEY
 );
 
-// ✅ Hugging Face Space endpoint (your deployed FastAPI backend)
 const HF_BACKEND_URL = "https://anurag2416-clip-embed-api.hf.space/recommend";
 
-// ✅ Upload image to Supabase bucket
 async function uploadToBucket(fileBuffer, fileName) {
   const { data, error } = await supabase.storage
     .from("uploads")
@@ -46,12 +41,10 @@ export const handler = async (event) => {
       throw new Error("No imageBase64 field provided in request.");
     }
 
-    // ✅ Convert base64 to buffer and upload
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // ✅ Send uploaded Supabase URL to Hugging Face backend
     const hfResponse = await fetch(HF_BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

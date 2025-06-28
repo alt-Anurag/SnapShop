@@ -7,7 +7,7 @@ import numpy as np
 
 app = FastAPI()
 
-# Serve frontend files
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.websocket("/ws")
@@ -21,7 +21,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if not ret:
                 break
                 
-            # Convert frame to base64
+           
             _, buffer = cv2.imencode('.jpg', frame)
             jpg_as_text = base64.b64encode(buffer).decode('utf-8')
             
@@ -39,5 +39,5 @@ async def upload_image(image: UploadFile = File(...)):
     nparr = np.frombuffer(image_data, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     
-    # Process with Gemini API here later
+    
     return {"status": "success"}

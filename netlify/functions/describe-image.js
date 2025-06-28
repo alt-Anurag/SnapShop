@@ -15,7 +15,6 @@ exports.handler = async (event) => {
     const { image } = JSON.parse(event.body);
     if (!image) throw new Error("No image data received");
 
-    // Convert base64 to Google Generative AI format
     const imageParts = [
       {
         inlineData: {

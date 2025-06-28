@@ -1,16 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Mobile menu toggle - improved version
   const mobileMenuButton = document.querySelector(".mobile-menu-button");
   const mobileMenu = document.querySelector(".mobile-menu");
 
   mobileMenuButton.addEventListener("click", function () {
     mobileMenu.classList.toggle("hidden");
-    // Toggle aria-expanded for accessibility
+
     const isExpanded = this.getAttribute("aria-expanded") === "true";
     this.setAttribute("aria-expanded", !isExpanded);
   });
 
-  // Close mobile menu when clicking outside
   document.addEventListener("click", function (e) {
     if (
       !mobileMenu.contains(e.target) &&
@@ -21,13 +19,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Mobile viewport height correction
   function adjustViewport() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
   }
 
-  // Fix for initial mobile load
   window.addEventListener("load", () => {
     if (window.innerWidth < 768) {
       setTimeout(() => {
@@ -36,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Run on load and resize
   window.addEventListener("load", adjustViewport);
   window.addEventListener("resize", adjustViewport);
   adjustViewport();
@@ -60,12 +55,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const API_ENDPOINT = "/.netlify/functions/describe-image";
   const RECOMMENDATIONS_ENDPOINT = "/.netlify/functions/recommend-products";
 
-  // ✅ Global variables for background preloading
   let preloadedRecommendations = null;
   let preloadingInProgress = false;
   let currentImageBase64 = null;
 
-  // Handle drag and drop
   uploadContainer.addEventListener("dragover", (e) => {
     e.preventDefault();
     uploadContainer.classList.add("border-teal", "bg-teal-light");
@@ -84,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Handle file selection
   browseBtn.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", (e) => {
     if (e.target.files.length) {
@@ -92,10 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Universal mobile layout enforcer
   function enforceMobileLayout() {
     if (window.innerWidth < 768) {
-      // Calculate required spacing
       const navbarHeight = document.querySelector(".glass-navbar").offsetHeight;
       document.querySelector(
         ".hero-section"
@@ -103,26 +93,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Run on load and resize
   window.addEventListener("load", enforceMobileLayout);
   window.addEventListener("resize", enforceMobileLayout);
 
-  // ✅ REVERTED: Original camera button implementation from backup
   cameraBtn.addEventListener("click", () => {
-    // Set the file input to accept images and use camera
     fileInput.setAttribute("capture", "environment");
     fileInput.setAttribute("accept", "image/*");
     fileInput.click();
   });
 
-  // Sample button
   sampleBtn.addEventListener("click", async () => {
-    // Use a sample image for demo
     previewImage.src =
       "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
     showPreview();
 
-    // Show loading state
     detectedItems.innerHTML = `
             <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -141,9 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       reader.onload = async function () {
         const base64Image = reader.result.split(",")[1];
-        currentImageBase64 = base64Image; // ✅ Store for background preloading
+        currentImageBase64 = base64Image;
 
-        // ✅ Start background preloading immediately
         startBackgroundPreloading(base64Image);
 
         const description = await getImageDescription(base64Image);
@@ -160,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ✅ Background preloading function
   async function startBackgroundPreloading(base64Image) {
     if (preloadingInProgress) return;
 
@@ -193,13 +175,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ UPDATED: Find products button - Only shows Recommended Products section
   findProductsBtn.addEventListener("click", async () => {
     findProductsBtn.innerHTML = "🔍 Searching...";
     findProductsBtn.disabled = true;
 
     try {
-      // ✅ Show immediate results if preloaded, otherwise show 7-second loader
       if (preloadedRecommendations && preloadedRecommendations.products) {
         console.log("⚡ Using preloaded recommendations!");
         await showPreloadedResults();
@@ -208,11 +188,10 @@ document.addEventListener("DOMContentLoaded", function () {
         await showResultsWithLoader();
       }
 
-      // Smooth scroll to recommendations section only
       recommendationsSection.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error finding products:", error);
-      // Show error to user
+
       const recommendationsContainer =
         recommendationsSection.querySelector(".grid");
       recommendationsContainer.innerHTML = `
@@ -228,17 +207,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ✅ UPDATED: Show preloaded results - Only Recommended Products section
   async function showPreloadedResults() {
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
 
-    // Show only recommendations section immediately with preloaded data
     recommendationsSection.classList.remove("hidden");
 
     const products = preloadedRecommendations.products || [];
 
-    // Populate "Recommended Products" section only
     if (products.length > 0) {
       recommendationsContainer.innerHTML = "";
       products.forEach((product) => {
@@ -255,43 +231,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ UPDATED: Show results with 7-second loader - Only Recommended Products section
   async function showResultsWithLoader() {
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
 
-    // Show loading state for recommendations section only
     recommendationsContainer.innerHTML = `
             <div class="col-span-full flex items-center justify-center py-12">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal mx-auto mb-4"></div>
-                    <p class="text-gray-600">Finding style recommendations...</p>
+                    <p class="text-gray-600">Curating your perfect picks...</p>
                 </div>
             </div>
         `;
 
     recommendationsSection.classList.remove("hidden");
 
-    // ✅ 7-second delay simulation while making actual API call
     const [_, actualResults] = await Promise.all([
-      new Promise((resolve) => setTimeout(resolve, 7000)), // 7-second delay
-      fetchRecommendationsFromAPI(), // Actual API call
+      new Promise((resolve) => setTimeout(resolve, 4500)),
+      fetchRecommendationsFromAPI(),
     ]);
 
-    // Show real results after delay
     if (
       actualResults &&
       actualResults.products &&
       actualResults.products.length > 0
     ) {
-      // Populate "Recommended Products" section only
       recommendationsContainer.innerHTML = "";
       actualResults.products.forEach((product) => {
         const recommendationCard = createProductCard(product);
         recommendationsContainer.appendChild(recommendationCard);
       });
     } else {
-      // Show no results message
       recommendationsContainer.innerHTML = `
                 <div class="col-span-full text-center py-8">
                     <p class="text-gray-600 mb-2">No matching products found</p>
@@ -301,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ Fetch recommendations from API
   async function fetchRecommendationsFromAPI() {
     try {
       const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
@@ -325,10 +294,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ Create product card helper function
   function createProductCard(product) {
     const productCard = document.createElement("div");
-    // Added shadows and transitions for a better look
+
     productCard.className =
       "product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 fade-in";
 
@@ -343,7 +311,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (product.URL.startsWith("http")) {
           productUrl = product.URL;
         } else {
-          // Fallback for cases like "myntra.com/..."
           productUrl = `https://${product.URL}`;
         }
       }
@@ -390,7 +357,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return productCard;
   }
 
-  // ✅ Handle image upload with background preloading
   async function handleImageUpload(file) {
     if (!file.type.match("image.*")) {
       alert("Please select an image file");
@@ -402,7 +368,6 @@ document.addEventListener("DOMContentLoaded", function () {
       previewImage.src = e.target.result;
       showPreview();
 
-      // Show loading state
       detectedItems.innerHTML = `
                 <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -414,17 +379,13 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
 
       try {
-        // Convert image to base64
         const base64Image = e.target.result.split(",")[1];
         currentImageBase64 = base64Image; // ✅ Store for background preloading
 
-        // ✅ Start background preloading immediately
         startBackgroundPreloading(base64Image);
 
-        // Call the API for description
         const description = await getImageDescription(base64Image);
 
-        // Display the description
         displayDescription(description);
       } catch (error) {
         console.error("Error:", error);
@@ -438,15 +399,13 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.readAsDataURL(file);
   }
 
-  // Get image description from API
   async function getImageDescription(base64Image) {
     try {
-      // First update to "Describing image..."
       detectedItems.innerHTML = `
                 <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     <div>
-                        <p class="font-medium text-blue-900">Describing image...</p>
+                        <p class="font-medium text-blue-900">Analyzing Image...</p>
                         <p class="text-sm text-blue-600">Almost done!</p>
                     </div>
                 </div>
@@ -472,14 +431,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Display the description with improved formatting
   function displayDescription(description) {
     // Split the description into bullet points if it contains newlines
     const descriptionPoints = description
       .split("\n")
       .filter((point) => point.trim() !== "");
 
-    // Create HTML for the description
     let descriptionHTML = '<div class="space-y-2">';
 
     descriptionPoints.forEach((point) => {
@@ -496,22 +453,18 @@ document.addEventListener("DOMContentLoaded", function () {
     detectedItems.innerHTML = descriptionHTML;
   }
 
-  // Show preview section
   function showPreview() {
     uploadContainer.classList.add("hidden");
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
   }
 
-  // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
   const navbar = document.querySelector(".glass-navbar");
 
-  // Apply glass effect immediately
   navbar.style.backdropFilter = "blur(12px) saturate(160%)";
   navbar.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
   navbar.style.webkitBackdropFilter = "blur(12px) saturate(160%)";
 
-  // Dynamic light follow (mouse tracking)
   document.addEventListener("mousemove", (e) => {
     const x = e.clientX / window.innerWidth;
     const y = e.clientY / window.innerHeight;
@@ -522,10 +475,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastScrollY = window.scrollY;
 
   window.addEventListener("scroll", () => {
-    // Blur intensity increases with scroll
     const scrollBlur = Math.min(12 + window.scrollY / 20, 20);
 
-    // Background opacity decreases slightly when scrolling down
     const opacityDirection = window.scrollY > lastScrollY ? 0.2 : 0.25;
     const scrollOpacity = Math.max(
       0.15,
