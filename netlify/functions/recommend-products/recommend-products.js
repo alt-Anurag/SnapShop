@@ -16,7 +16,7 @@ const hf = new HfInference(process.env.HF_API_TOKEN);
 // Upload image to Supabase bucket
 async function uploadToBucket(fileBuffer, fileName) {
   const { data, error } = await supabase.storage
-    .from("uploads") // your public bucket name
+    .from("uploads")
     .upload(`user_uploads/${fileName}`, fileBuffer, {
       contentType: "image/jpeg",
       upsert: true,
@@ -32,7 +32,7 @@ async function uploadToBucket(fileBuffer, fileName) {
 }
 
 export const handler = async (event) => {
-  console.log("🔑 Supabase Key Length:", process.env.SUPABASE_ANON_KEY?.length); // Debug log
+  console.log("🔑 Supabase Key Length:", process.env.SUPABASE_ANON_KEY?.length);
 
   if (event.httpMethod !== "POST") {
     return {
@@ -50,31 +50,20 @@ export const handler = async (event) => {
     const base64Image = body.imageBase64;
     if (!base64Image) throw new Error("No image provided");
 
-    // Convert base64 to buffer
+    // Convert base64 to buffer to upload to Supabase
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
 
-    // Upload to Supabase → get public URL
+    // Upload to Supabase and get public URL
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // Fetch image back (as Hugging Face expects remote file input)
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(
-        `Failed to fetch uploaded image: ${imageResponse.statusText}`
-      );
-    }
-
-    const arrayBuffer = await imageResponse.arrayBuffer();
-    const imageBase64 = Buffer.from(arrayBuffer).toString("base64");
-
-    // Send base64 as a string (mimics browser file upload)
+    // ✅ Directly use base64 image string for Hugging Face input
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
-      inputs: `data:image/jpeg;base64,${imageBase64}`,
+      inputs: base64Image,
     });
 
-    // Call Supabase RPC
+    // Query Supabase for similar products
     const { data, error: rpcError } = await supabase.rpc("similar_products", {
       query_embedding: embedding,
       match_threshold: 0.25,
