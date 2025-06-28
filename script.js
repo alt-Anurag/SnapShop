@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
     recommendationsSection.classList.remove("hidden");
 
     const [_, actualResults] = await Promise.all([
-      new Promise((resolve) => setTimeout(resolve, 4500)),
+      new Promise((resolve) => setTimeout(resolve, 5000)),
       fetchRecommendationsFromAPI(),
     ]);
 
