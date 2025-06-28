@@ -1,19 +1,18 @@
 // netlify/functions/recommend-products.js
 
 import { createClient } from "@supabase/supabase-js";
-import { HfInference } from "@huggingface/inference";
-import fetch from "node-fetch";
+import fetch from "node-fetch"; // used for both Supabase and Hugging Face API
 
-// ✅ Supabase client with environment variable
+// ✅ Supabase client
 const supabase = createClient(
   "https://jsnbscsxsqrrdgllgttw.supabase.co",
   process.env.SUPABASE_ANON_KEY
 );
 
-// Hugging Face client
-const hf = new HfInference(process.env.HF_API_TOKEN);
+// Hugging Face REST token
+const HF_API_TOKEN = process.env.HF_API_TOKEN;
 
-// Upload image to Supabase bucket
+// ✅ Upload image to Supabase bucket
 async function uploadToBucket(fileBuffer, fileName) {
   const { data, error } = await supabase.storage
     .from("uploads")
@@ -42,7 +41,7 @@ export const handler = async (event) => {
   }
 
   try {
-    if (!process.env.HF_API_TOKEN) {
+    if (!HF_API_TOKEN) {
       throw new Error("Hugging Face API token not configured");
     }
 
@@ -50,20 +49,38 @@ export const handler = async (event) => {
     const base64Image = body.imageBase64;
     if (!base64Image) throw new Error("No image provided");
 
-    // Convert base64 to buffer to upload to Supabase
+    // Convert base64 to buffer for upload
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
 
-    // Upload to Supabase and get public URL
+    // ✅ Upload to Supabase
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // ✅ Directly use base64 image string for Hugging Face input
-    const embedding = await hf.featureExtraction({
-      model: "openai/clip-vit-base-patch32",
-      inputs: base64Image,
-    });
+    // ✅ Use Hugging Face Inference REST API (no SDK issues!)
+    const hfResponse = await fetch(
+      "https://api-inference.huggingface.co/pipeline/feature-extraction/openai/clip-vit-base-patch32",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${HF_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: base64Image,
+        }),
+      }
+    );
 
-    // Query Supabase for similar products
+    if (!hfResponse.ok) {
+      const err = await hfResponse.json().catch(() => ({}));
+      throw new Error(
+        `Hugging Face error: ${err.error || hfResponse.statusText}`
+      );
+    }
+
+    const embedding = await hfResponse.json();
+
+    // ✅ Query Supabase RPC function for similar products
     const { data, error: rpcError } = await supabase.rpc("similar_products", {
       query_embedding: embedding,
       match_threshold: 0.25,
