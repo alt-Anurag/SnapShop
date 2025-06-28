@@ -58,7 +58,7 @@ export const handler = async (event) => {
 
     // ✅ Use Hugging Face Inference REST API (no SDK issues!)
     const hfResponse = await fetch(
-      "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
+      "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base"
 ,
       {
         method: "POST",
