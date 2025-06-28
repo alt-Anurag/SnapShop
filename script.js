@@ -235,11 +235,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
 
+    const phrases = [
+      "Curating your perfect picks...",
+      "Finding your kinda vibe...",
+      "Brewing up Recommendations...",
+      "Lining up tuff for you...",
+    ];
+    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
     recommendationsContainer.innerHTML = `
             <div class="col-span-full flex items-center justify-center py-12">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal mx-auto mb-4"></div>
-                    <p class="text-gray-600">Curating your perfect picks...</p>
+                    <p class="text-gray-600">${randomPhrase}</p>
                 </div>
             </div>
         `;
