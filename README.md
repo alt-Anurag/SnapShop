@@ -53,29 +53,74 @@ A complete serverless, AI-driven stack:
 The project follows a sophisticated, multi-step pipeline to deliver recommendations.
 
 ```
-```mermaid
-graph TD
-    A[1. User Uploads Image] --> B{Frontend};
-    B --> |Sends base64 image| C[Netlify Function: describe-image];
-    C --> D[Google Gemini API];
-    D --> |Returns Text Description| C;
-    C --> |Displays Description| B;
+🧠 Workflow Overview:
+1. User Uploads Image
+          |
+          v
+     ┌────────────┐
+     │ Frontend   │
+     └────┬───────┘
+          | 
+          | Sends base64 image
+          v
+┌────────────────────────────┐
+│ Netlify Function:          │
+│ describe-image             │
+└────────────┬───────────────┘
+             | 
+             | Calls Google Gemini API
+             v
+     ┌─────────────────────┐
+     │ Google Gemini API   │
+     └────────┬────────────┘
+              | Returns text description
+              v
+ ┌─────────────────────────────┐
+ │ Frontend displays caption   │
+ └─────────────────────────────┘
 
-    subgraph "Background Preloading (Parallel Process)"
-        B --> |Sends base64 image| E[Netlify Function: recommend-products];
-        E --> |Uploads image| F[Supabase Storage];
-        F --> |Returns Public URL| E;
-        E --> |Sends URL| G[Hugging Face API (CLIP Model)];
-        G --> |Returns 512D Embeddings| E;
-        E --> |Vector Search Query| H[Supabase DB (pgvector)];
-        H --> |Returns Top 5 Products| E;
-    end
+🔄 Background Preloading (Parallel Process):
 
-    I[2. User clicks 'Find Matching Products'] --> J{Frontend};
-    J --> |Retrieves preloaded data| E;
-    E --> |Sends Product Data| J;
-    J --> K[3. Displays Recommendations];
-```
+Frontend
+    |
+    | Sends base64 image
+    v
+Netlify Function: recommend-products
+    |
+    | Uploads image
+    v
+Supabase Storage
+    |
+    | Returns public URL
+    v
+Hugging Face API (CLIP Model)
+    |
+    | Returns 512D embeddings
+    v
+Supabase DB (pgvector)
+    |
+    | Returns top 5 products
+    v
+Preloaded in Netlify function
+
+🎯 When User Clicks "Find Matching Products":
+
+2. User Clicks Button
+          |
+          v
+     ┌────────────┐
+     │ Frontend   │
+     └────┬───────┘
+          |
+          | Retrieves preloaded results
+          v
+Netlify Function (already preloaded)
+          |
+          | Sends product data
+          v
+3. Frontend Displays Recommendations
+
+---
 
 
 ## Performance Optimization: Solving the Cold Start Problem
