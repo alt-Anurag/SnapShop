@@ -1,3 +1,11 @@
 [build]
   functions = "netlify/functions"
   publish = "."
+
+[build.environment]
+  HF_API_TOKEN = "@hf_api_token"
+
+[dev]
+  framework = "#custom"
+  targetPort = 3000
+  autoLaunch = true

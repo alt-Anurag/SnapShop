@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Hugging Face CLIP API endpoint
 const HF_CLIP_API =
   "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
-const HF_TOKEN = "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"; // Get this from your Hugging Face account
+const HF_TOKEN = process.env.HF_API_TOKEN; // Get this from your Hugging Face account
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
