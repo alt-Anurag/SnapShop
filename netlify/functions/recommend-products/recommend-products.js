@@ -1,14 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { HfInference } from "@huggingface/inference";
-import fetch from "node-fetch"; // required in Netlify Functions
+import fetch from "node-fetch";
 
-// Initialize Supabase client
+// Initialize Supabase
 const supabase = createClient(
   "https://jsnbscsxsqrrdgllgttw.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 );
 
-// Initialize Hugging Face Inference client
+// Initialize Hugging Face
 const hf = new HfInference(process.env.HF_API_TOKEN);
 
 export const handler = async (event) => {
@@ -29,22 +29,21 @@ export const handler = async (event) => {
       throw new Error("No image URL provided");
     }
 
-    // Download the image
+    // Download the image as a Buffer
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to download image: ${imageResponse.statusText}`);
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const imageBlob = new Blob([imageBuffer]);
+    const imageBuffer = await imageResponse.buffer();
 
-    // Feature extraction using Hugging Face
+    // Extract features using buffer instead of Blob
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
-      inputs: imageBlob,
+      inputs: imageBuffer,
     });
 
-    // Query Supabase for similar products
+    // Query Supabase
     const { data, error: supabaseError } = await supabase.rpc("similar_products", {
       query_embedding: embedding,
       match_threshold: 0.25,
