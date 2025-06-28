@@ -1,6 +1,7 @@
-// netlify/functions/recommend-products.js
-const { createClient } = require("@supabase/supabase-js");
-const { HfInference } = require("@huggingface/inference"); // Import the library
+// netlify/functions/recommend-products/recommend-products.js
+import { createClient } from "@supabase/supabase-js";
+import { InferenceClient } from "@huggingface/inference";
+import fetch from "node-fetch"; // Required in Netlify Functions environment
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -8,11 +9,10 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4"
 );
 
-// Initialize Hugging Face Inference client with your token
-import { InferenceClient } from "@huggingface/inference"; // Use InferenceClient
-const hf = new InferenceClient(process.env.HF_API_TOKEN); // Initialize InferenceClient
+// Initialize Hugging Face Inference client
+const hf = new InferenceClient(process.env.HF_API_TOKEN);
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -36,16 +36,16 @@ exports.handler = async (event) => {
       throw new Error(`Failed to download image: ${imageResponse.statusText}`);
     }
 
-    // Get the image data as a Blob, which the library can handle
-    const imageBlob = await imageResponse.blob();
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBlob = new Blob([imageBuffer]);
 
-    // Use the library to get embeddings (feature extraction)
+    // Extract image features
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
       data: imageBlob,
     });
 
-    // Query similar products from Supabase
+    // Call Supabase RPC to get similar products
     const { data, error: supabaseError } = await supabase.rpc(
       "similar_products",
       {
@@ -65,7 +65,6 @@ exports.handler = async (event) => {
       }),
     };
   } catch (error) {
-    // The library may throw specific errors that are more descriptive
     console.error("Recommendation error:", error);
     return {
       statusCode: 500,
