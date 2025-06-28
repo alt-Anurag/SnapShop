@@ -1,10 +1,10 @@
 {
   "name": "recommend-products",
-  "version": "1.0.0",
   "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.39.4",
-    "@huggingface/inference": "^2.0.0",
-    "node-fetch": "^3.3.1"
+    "@huggingface/inference": "^2.0.3",
+    "node-fetch": "^3.3.2"
+
   }
 }

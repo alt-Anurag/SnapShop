@@ -1,7 +1,6 @@
-// netlify/functions/recommend-products/recommend-products.js
 import { createClient } from "@supabase/supabase-js";
-import { InferenceClient } from "@huggingface/inference";
-import fetch from "node-fetch"; // Required in Netlify Functions environment
+import { HfInference } from "@huggingface/inference";
+import fetch from "node-fetch"; // required in Netlify Functions
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -10,7 +9,7 @@ const supabase = createClient(
 );
 
 // Initialize Hugging Face Inference client
-const hf = new InferenceClient(process.env.HF_API_TOKEN);
+const hf = new HfInference(process.env.HF_API_TOKEN);
 
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -39,21 +38,18 @@ export const handler = async (event) => {
     const imageBuffer = await imageResponse.arrayBuffer();
     const imageBlob = new Blob([imageBuffer]);
 
-    // Extract image features
+    // Feature extraction using Hugging Face
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
-      data: imageBlob,
+      inputs: imageBlob,
     });
 
-    // Call Supabase RPC to get similar products
-    const { data, error: supabaseError } = await supabase.rpc(
-      "similar_products",
-      {
-        query_embedding: embedding,
-        match_threshold: 0.25,
-        match_count: 5,
-      }
-    );
+    // Query Supabase for similar products
+    const { data, error: supabaseError } = await supabase.rpc("similar_products", {
+      query_embedding: embedding,
+      match_threshold: 0.25,
+      match_count: 5,
+    });
 
     if (supabaseError) throw supabaseError;
 
