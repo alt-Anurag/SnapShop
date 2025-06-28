@@ -2,15 +2,15 @@
 const { createClient } = require("@supabase/supabase-js");
 
 // Initialize Supabase client
-const supabaseUrl = "https://jsnbscsxsqrrdgllgttw.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  "https://jsnbscsxsqrrdgllgttw.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4"
+);
 
-// Hugging Face CLIP API endpoint
-const HF_CLIP_API =
-  "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
-const HF_TOKEN = process.env.HF_API_TOKEN; // Get this from your Hugging Face account
+// Updated Hugging Face API configuration
+const HF_API_URL =
+  "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/clip-vit-base-patch32";
+const HF_TOKEN = process.env.HF_API_TOKEN;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -21,52 +21,81 @@ exports.handler = async (event) => {
   }
 
   try {
+    // Validate configuration
+    if (!HF_TOKEN) {
+      throw new Error("Hugging Face API token not configured");
+    }
+
     const { imageUrl } = JSON.parse(event.body);
     if (!imageUrl) {
       throw new Error("No image URL provided");
     }
 
-    // Use the built-in fetch (available in Netlify Functions environment)
     // First download the image
     const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to download image: ${imageResponse.statusText}`);
+    }
+
     const imageBuffer = await imageResponse.arrayBuffer();
 
-    // Send to Hugging Face CLIP API
-    const response = await fetch(HF_CLIP_API, {
+    // Prepare the Hugging Face API request
+    const hfResponse = await fetch(HF_API_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/octet-stream",
+        "Content-Type": "application/json",
       },
-      body: Buffer.from(imageBuffer),
+      body: JSON.stringify({
+        inputs: {
+          image: Buffer.from(imageBuffer).toString("base64"),
+        },
+      }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Hugging Face API error: ${response.statusText}`);
+    if (hfResponse.status === 404) {
+      throw new Error(
+        "The model endpoint was not found. Please check the API URL."
+      );
     }
 
-    const embedding = await response.json();
+    if (!hfResponse.ok) {
+      const errorDetails = await hfResponse.text();
+      throw new Error(
+        `Hugging Face API error: ${hfResponse.statusText} - ${errorDetails}`
+      );
+    }
+
+    const embedding = await hfResponse.json();
 
     // Query similar products from Supabase
-    const { data, error } = await supabase.rpc("similar_products", {
-      query_embedding: embedding,
-      match_threshold: 0.25,
-      match_count: 5,
-    });
+    const { data, error: supabaseError } = await supabase.rpc(
+      "similar_products",
+      {
+        query_embedding: embedding,
+        match_threshold: 0.25,
+        match_count: 5,
+      }
+    );
 
-    if (error) throw error;
+    if (supabaseError) throw supabaseError;
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ products: data }),
+      body: JSON.stringify({
+        products: data || [],
+        message: "Successfully retrieved recommendations",
+      }),
     };
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Recommendation error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({
         error: "Failed to get recommendations",
-        details: error.message,
+        message: error.message,
+        details:
+          process.env.NODE_ENV === "development" ? error.stack : undefined,
       }),
     };
   }

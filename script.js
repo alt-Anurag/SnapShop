@@ -420,22 +420,29 @@ document.addEventListener("DOMContentLoaded", function () {
         body: JSON.stringify({ imageUrl: previewImage.src }),
       });
 
+      // Parse response and handle errors
+      const result = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error ||
-            errorData.message ||
-            `API request failed with status ${response.status}`
-        );
+        // Handle different types of errors with specific messages
+        let errorMessage = "Failed to get recommendations";
+
+        if (response.status === 404) {
+          errorMessage = "Recommendation service is currently unavailable";
+        } else if (response.status === 401) {
+          errorMessage = "Authentication failed - please refresh the page";
+        } else if (result.error) {
+          errorMessage = result.error;
+        } else if (result.message) {
+          errorMessage = result.message;
+        } else {
+          errorMessage = `API request failed with status ${response.status}`;
+        }
+
+        throw new Error(errorMessage);
       }
 
-      const { products, error: apiError } = await response.json();
-
-      if (apiError) {
-        throw new Error(apiError);
-      }
-
-      if (!products || products.length === 0) {
+      if (!result.products || result.products.length === 0) {
         resultsContainer.innerHTML = `
         <div class="col-span-full text-center py-8">
           <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
@@ -450,18 +457,21 @@ document.addEventListener("DOMContentLoaded", function () {
       resultsContainer.innerHTML = "";
 
       // Display actual products
-      products.slice(0, 3).forEach((product) => {
-        // Show first 3 as main results
+      result.products.slice(0, 3).forEach((product) => {
         const productCard = document.createElement("div");
         productCard.className =
           "product-card bg-white rounded-xl overflow-hidden fade-in";
 
-        // Create product URL with fallback
+        // Create product URL with fallback and validation
         let productUrl = "#";
         if (product.URL) {
-          productUrl = product.URL.startsWith("http")
-            ? product.URL
-            : `https://${product.URL}`;
+          try {
+            productUrl = new URL(product.URL).href;
+          } catch (e) {
+            productUrl = product.URL.startsWith("www.")
+              ? `https://${product.URL}`
+              : product.URL;
+          }
         }
 
         productCard.innerHTML = `
@@ -479,6 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
           <a href="${productUrl}" 
              target="_blank" 
+             rel="noopener noreferrer"
              class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
             <i class="fas fa-shopping-cart mr-2"></i>View Product
           </a>
@@ -488,16 +499,40 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     } catch (error) {
       console.error("Error showing results:", error);
+
+      // Determine user-friendly error message
+      let userMessage = error.message || "Please try again later";
+      let technicalDetails = "";
+
+      if (error.message.includes("service is currently unavailable")) {
+        userMessage =
+          "Our recommendation service is temporarily down. We're working to fix it!";
+        technicalDetails =
+          "The recommendation engine API is currently unavailable";
+      } else if (error.message.includes("Authentication failed")) {
+        userMessage = "Session expired - please refresh the page";
+        technicalDetails = "Authentication token invalid or expired";
+      }
+
       resultsContainer.innerHTML = `
       <div class="col-span-full text-center py-8">
         <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
-        <p class="text-red-500 font-medium">Failed to load products</p>
+        <p class="text-red-500 font-medium">${userMessage}</p>
         <p class="text-teal-light">${
-          error.message || "Please try again later"
+          technicalDetails || "Please check your connection and try again"
         }</p>
+        ${
+          process.env.NODE_ENV === "development"
+            ? `<p class="text-xs text-gray-500 mt-2">Technical: ${error.message}</p>`
+            : ""
+        }
       </div>
     `;
-      throw error; // Rethrow to be caught by the parent function
+
+      // Only rethrow if you want the error to be caught by a parent function
+      if (process.env.NODE_ENV === "development") {
+        throw error;
+      }
     }
   }
   // Show recommendations - UPDATED VERSION
