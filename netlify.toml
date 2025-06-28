@@ -5,6 +5,11 @@
 [build.environment]
   HF_API_TOKEN = "@hf_api_token"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+
 [dev]
   framework = "#custom"
   targetPort = 3000
