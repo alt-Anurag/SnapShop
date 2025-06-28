@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 // Supabase client
 const supabase = createClient(
   "https://jsnbscsxsqrrdgllgttw.supabase.co",
-  "your_supabase_anon_key"
+  "process.env.SUPABASE_ANON_KEY"
 );
 
 // Hugging Face
