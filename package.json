@@ -1,23 +1,9 @@
 {
-  "name": "snapshop",
-  "version": "1.0.0",
-  "main": "script.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alt-Anurag/snapshop-anuarg.git"
-  },
-  "keywords": [],
-  "author": "Anurag Kumar Jha",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/alt-Anurag/snapshop-anuarg/issues"
-  },
-  "homepage": "https://github.com/alt-Anurag/snapshop-anuarg#readme",
-  "description": "",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1"
+    "@google/generative-ai": "^0.1.0",
+    "@supabase/supabase-js": "^2.21.0",
+    "@tensorflow/tfjs-node": "^4.2.0",
+    "@tensorflow-models/mobilenet": "^2.1.0",
+    "node-fetch": "^3.3.1"
   }
 }

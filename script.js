@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // API Configuration
   const API_ENDPOINT = "/.netlify/functions/describe-image";
+  const RECOMMENDATIONS_ENDPOINT = "/.netlify/functions/recommend-products";
 
   // Handle drag and drop
   uploadContainer.addEventListener("dragover", (e) => {
@@ -255,23 +256,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Find products button
-  findProductsBtn.addEventListener("click", () => {
+  // Find products button - UPDATED VERSION
+  findProductsBtn.addEventListener("click", async () => {
     findProductsBtn.innerHTML =
       '<i class="fas fa-spinner fa-spin mr-2"></i> Searching...';
     findProductsBtn.disabled = true;
 
-    // Simulate API call delay
-    setTimeout(() => {
-      showResults();
-      showRecommendations();
-      findProductsBtn.innerHTML =
-        '<i class="fas fa-search mr-2"></i>Find Matching Products';
-      findProductsBtn.disabled = false;
+    try {
+      await showResults();
+      await showRecommendations();
 
       // Smooth scroll to results
       resultsSection.scrollIntoView({ behavior: "smooth" });
-    }, 1500);
+    } catch (error) {
+      console.error("Error finding products:", error);
+      // Show error to user
+      const resultsContainer = resultsSection.querySelector(".grid");
+      resultsContainer.innerHTML = `
+        <div class="col-span-full text-center py-8">
+          <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
+          <p class="text-red-500 font-medium">Failed to load products</p>
+          <p class="text-teal-light">Please try again later</p>
+        </div>
+      `;
+      resultsSection.classList.remove("hidden");
+    } finally {
+      findProductsBtn.innerHTML =
+        '<i class="fas fa-search mr-2"></i>Find Matching Products';
+      findProductsBtn.disabled = false;
+    }
   });
 
   // Handle image upload
@@ -384,112 +397,164 @@ document.addEventListener("DOMContentLoaded", function () {
     previewSection.classList.add("fade-in");
   }
 
-  // Show results (simulated)
-  function showResults() {
+  // Show results - UPDATED VERSION
+  async function showResults() {
     const resultsContainer = resultsSection.querySelector(".grid");
-    resultsContainer.innerHTML = "";
-
-    // Simulated product data
-    const products = [
-      {
-        id: 1,
-        name: "Biker Leather Jacket",
-        price: "Rs.129.99",
-        image:
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-      {
-        id: 2,
-        name: "Slim Fit Jeans",
-        price: "Rs.59.99",
-        image:
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-      {
-        id: 3,
-        name: "Casual T-Shirt",
-        price: "Rs.29.99",
-        image:
-          "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-    ];
-
-    products.forEach((product) => {
-      const productCard = document.createElement("div");
-      productCard.className =
-        "product-card bg-white rounded-xl overflow-hidden fade-in";
-      productCard.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" class="w-full h-60 object-cover">
-        <div class="p-4">
-          <h3 class="font-medium text-indigo-dark mb-1">${product.name}</h3>
-          <p class="text-teal font-semibold mb-3">${product.price}</p>
-          <button class="w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
-            <i class="fas fa-shopping-cart mr-2"></i>View Product
-          </button>
+    resultsContainer.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <div class="animate-pulse flex flex-col items-center">
+          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+          <p class="text-teal font-medium">Finding matching products...</p>
         </div>
-      `;
-      resultsContainer.appendChild(productCard);
-    });
+      </div>
+    `;
 
     resultsSection.classList.remove("hidden");
+
+    try {
+      // Get recommendations for the current preview image
+      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl: previewImage.src }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const { products } = await response.json();
+
+      if (!products || products.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="col-span-full text-center py-8">
+            <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
+            <p class="text-teal font-medium">No matching products found</p>
+            <p class="text-teal-light">Try uploading a different image</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Clear loading state
+      resultsContainer.innerHTML = "";
+
+      // Display actual products
+      products.slice(0, 3).forEach((product) => {
+        // Show first 3 as main results
+        const productCard = document.createElement("div");
+        productCard.className =
+          "product-card bg-white rounded-xl overflow-hidden fade-in";
+        productCard.innerHTML = `
+          <img src="${
+            product.Image ||
+            "https://via.placeholder.com/300x300?text=Product+Image"
+          }" 
+               alt="${product.Product}" 
+               class="w-full h-60 object-cover"
+               onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
+          <div class="p-4">
+            <h3 class="font-medium text-indigo-dark mb-1">${
+              product.Product || "Product"
+            }</h3>
+            <p class="text-teal font-semibold mb-3">₹${
+              product.Price || "N/A"
+            }</p>
+            <a href="${
+              product.URL || "#"
+            }" target="_blank" class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
+              <i class="fas fa-shopping-cart mr-2"></i>View Product
+            </a>
+          </div>
+        `;
+        resultsContainer.appendChild(productCard);
+      });
+    } catch (error) {
+      console.error("Error showing results:", error);
+      throw error; // Rethrow to be caught by the parent function
+    }
   }
 
-  // Show recommendations (simulated)
-  function showRecommendations() {
+  // Show recommendations - UPDATED VERSION
+  async function showRecommendations() {
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
-    recommendationsContainer.innerHTML = "";
-
-    // Simulated recommendation data
-    const recommendations = [
-      {
-        id: 1,
-        name: "Aviator Sunglasses",
-        price: "Rs.39.99",
-        image:
-          "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-      {
-        id: 2,
-        name: "Leather Belt",
-        price: "Rs.24.99",
-        image:
-          "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-      {
-        id: 3,
-        name: "Smart Watch",
-        price: "Rs.89.99",
-        image:
-          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-      {
-        id: 4,
-        name: "Leather Wallet",
-        price: "Rs.19.99",
-        image:
-          "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      },
-    ];
-
-    recommendations.forEach((item) => {
-      const recommendationCard = document.createElement("div");
-      recommendationCard.className =
-        "product-card bg-white rounded-xl overflow-hidden fade-in";
-      recommendationCard.innerHTML = `
-        <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="font-medium text-indigo-dark mb-1">${item.name}</h3>
-          <p class="text-teal font-semibold mb-3">${item.price}</p>
-          <button class="w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center" style="background-color: var(--green);">
-            <i class="fas fa-plus mr-2"></i>Add to Style
-          </button>
+    recommendationsContainer.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <div class="animate-pulse flex flex-col items-center">
+          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+          <p class="text-teal font-medium">Finding style recommendations...</p>
         </div>
-      `;
-      recommendationsContainer.appendChild(recommendationCard);
-    });
+      </div>
+    `;
 
     recommendationsSection.classList.remove("hidden");
+
+    try {
+      // Get recommendations for the current preview image
+      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl: previewImage.src }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const { products } = await response.json();
+
+      if (!products || products.length === 0) {
+        recommendationsContainer.innerHTML = `
+          <div class="col-span-full text-center py-8">
+            <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
+            <p class="text-teal font-medium">No recommendations found</p>
+            <p class="text-teal-light">Try uploading a different image</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Clear loading state
+      recommendationsContainer.innerHTML = "";
+
+      // Display actual recommendations (show all products as recommendations)
+      products.forEach((product) => {
+        const recommendationCard = document.createElement("div");
+        recommendationCard.className =
+          "product-card bg-white rounded-xl overflow-hidden fade-in";
+        recommendationCard.innerHTML = `
+          <img src="${
+            product.Image ||
+            "https://via.placeholder.com/300x300?text=Product+Image"
+          }" 
+               alt="${product.Product}" 
+               class="w-full h-48 object-cover"
+               onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
+          <div class="p-4">
+            <h3 class="font-medium text-indigo-dark mb-1">${
+              product.Product || "Product"
+            }</h3>
+            <p class="text-teal font-semibold mb-3">₹${
+              product.Price || "N/A"
+            }</p>
+            <a href="${
+              product.URL || "#"
+            }" target="_blank" class="block w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center" style="background-color: var(--green);">
+              <i class="fas fa-plus mr-2"></i>Add to Style
+            </a>
+          </div>
+        `;
+        recommendationsContainer.appendChild(recommendationCard);
+      });
+    } catch (error) {
+      console.error("Error showing recommendations:", error);
+      throw error; // Rethrow to be caught by the parent function
+    }
   }
 
   // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
