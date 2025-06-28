@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "Curating your perfect picks...",
       "Finding your kinda vibe...",
       "Brewing up Recommendations...",
-      "Lining up tuff for you...",
+      "Lining up stuff for you...",
     ];
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
     recommendationsContainer.innerHTML = `
