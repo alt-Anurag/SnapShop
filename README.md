@@ -53,6 +53,7 @@ A complete serverless, AI-driven stack:
 The project follows a sophisticated, multi-step pipeline to deliver recommendations.
 
 ```
+```mermaid
 graph TD
     A[1. User Uploads Image] --> B{Frontend};
     B --> |Sends base64 image| C[Netlify Function: describe-image];
@@ -75,6 +76,7 @@ graph TD
     E --> |Sends Product Data| J;
     J --> K[3. Displays Recommendations];
 ```
+
 
 ## Performance Optimization: Solving the Cold Start Problem
 
