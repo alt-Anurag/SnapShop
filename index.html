@@ -2,9 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SnapShop - Visual Shopping Assistant</title>
+    <!-- Tailwind CSS with all variants enabled -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
     <script>
         tailwind.config = {
@@ -15,10 +17,10 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+        rel="stylesheet">
 </head>
 
 <body class="bg-cream font-poppins" style="padding-top: 70px;">
@@ -91,8 +93,10 @@
         <div class="container mx-auto px-4 pt-24 pb-12">
             <div class="text-center mb-12">
                 <h1 class="text-4xl font-bold text-indigo-dark mb-4">Discover Products With Just a Snap</h1>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Upload a photo to find similar items and get
-                    personalized recommendations tailored to your preferences.</p>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Upload a photo to find similar items and
+                    get
+                    personalized
+                    recommendations tailored to your preferences.</p>
             </div>
 
             <!-- Upload Section -->
@@ -108,7 +112,7 @@
                             <i class="fas fa-folder-open mr-2"></i>Browse Files
                         </button>
                         <label for="file-input" class="sr-only">Upload an image</label>
-                        <input type="file" id="file-input" accept="image/*" class="hidden" title="Upload an image" />
+                        <input type="file" id="file-input" accept="image/*" class="hidden" title="Upload an image">
                     </div>
                     <div class="mt-4 flex justify-center space-x-4">
                         <button id="camera-btn"
@@ -123,7 +127,7 @@
                 </div>
             </div>
 
-            <!-- Preview Section -->
+            <!-- Preview Section (Initially Hidden) -->
             <div id="preview-section" class="max-w-3xl mx-auto hidden">
                 <div class="flex flex-col md:flex-row gap-6 mb-8">
                     <div class="w-full md:w-1/2 bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -131,7 +135,7 @@
                             <h3 class="font-medium text-indigo-dark">Your Image</h3>
                         </div>
                         <div class="p-4">
-                            <img id="preview-image" src="" alt="Preview" class="w-full h-auto rounded-lg shadow-sm" />
+                            <img id="preview-image" src="" alt="Preview" class="w-full h-auto rounded-lg shadow-sm">
                         </div>
                     </div>
                     <div class="w-full md:w-1/2 bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -153,11 +157,19 @@
                 </button>
             </div>
 
-            <!-- Only This Section Remains for Recommendations -->
+            <!-- Results Section (Initially Hidden) -->
             <div id="results-section" class="hidden mt-16">
-                <h2 class="text-3xl font-bold text-indigo-dark mb-8 text-center">Recommended Products</h2>
+                <h2 class="text-3xl font-bold text-indigo-dark mb-8 text-center">Recommended For You</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Product cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Recommendations Section (Initially Hidden) -->
+            <div id="recommendations-section" class="hidden mt-16">
+                <h2 class="text-3xl font-bold text-indigo-dark mb-8 text-center">Complete Your Look</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Product cards will be inserted here -->
+                    <!-- Recommendation cards will be inserted here by JavaScript -->
                 </div>
             </div>
         </div>
