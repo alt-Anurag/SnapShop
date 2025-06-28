@@ -1,5 +1,6 @@
 // netlify/functions/recommend-products.js
 const { createClient } = require("@supabase/supabase-js");
+const { HfInference } = require("@huggingface/inference"); // Import the library
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -7,10 +8,9 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4"
 );
 
-// CORRECTED: Use the direct model endpoint for feature extraction.
-const HF_API_URL =
-  "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
-const HF_TOKEN = process.env.HF_API_TOKEN;
+// Initialize Hugging Face Inference client with your token
+import { InferenceClient } from "@huggingface/inference"; // Use InferenceClient
+const hf = new InferenceClient(process.env.HF_API_TOKEN); // Initialize InferenceClient
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -21,8 +21,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Validate configuration
-    if (!HF_TOKEN) {
+    if (!process.env.HF_API_TOKEN) {
       throw new Error("Hugging Face API token not configured");
     }
 
@@ -31,40 +30,20 @@ exports.handler = async (event) => {
       throw new Error("No image URL provided");
     }
 
-    // First download the image
+    // Download the image
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to download image: ${imageResponse.statusText}`);
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer();
+    // Get the image data as a Blob, which the library can handle
+    const imageBlob = await imageResponse.blob();
 
-    // CORRECTED: Prepare the Hugging Face API request with binary data
-    const hfResponse = await fetch(HF_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${HF_TOKEN}`,
-        // REMOVED: "Content-Type": "application/json"
-      },
-      // CORRECTED: Send the raw image buffer directly as the body
-      body: imageBuffer,
+    // Use the library to get embeddings (feature extraction)
+    const embedding = await hf.featureExtraction({
+      model: "openai/clip-vit-base-patch32",
+      data: imageBlob,
     });
-
-    if (hfResponse.status === 404) {
-      throw new Error(
-        "The model endpoint was not found. Please check the API URL."
-      );
-    }
-
-    if (!hfResponse.ok) {
-      const errorDetails = await hfResponse.text();
-      throw new Error(
-        `Hugging Face API error: ${hfResponse.statusText} - ${errorDetails}`
-      );
-    }
-
-    // The response is the embedding directly
-    const embedding = await hfResponse.json();
 
     // Query similar products from Supabase
     const { data, error: supabaseError } = await supabase.rpc(
@@ -86,14 +65,13 @@ exports.handler = async (event) => {
       }),
     };
   } catch (error) {
+    // The library may throw specific errors that are more descriptive
     console.error("Recommendation error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({
         error: "Failed to get recommendations",
         message: error.message,
-        details:
-          process.env.NODE_ENV === "development" ? error.stack : undefined,
       }),
     };
   }
