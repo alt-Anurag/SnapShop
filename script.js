@@ -60,6 +60,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const API_ENDPOINT = "/.netlify/functions/describe-image";
   const RECOMMENDATIONS_ENDPOINT = "/.netlify/functions/recommend-products";
 
+  // ✅ NEW: Global variables for background preloading
+  let preloadedRecommendations = null;
+  let preloadingInProgress = false;
+  let currentImageBase64 = null;
+
   // Handle drag and drop
   uploadContainer.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -110,32 +115,36 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.className =
         "fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4";
       modal.innerHTML = `
-        <div class="rounded-lg p-4 max-w-md w-full" style="background-color:rgb(241, 236, 210)";>
-          <h3 class="text-xl font-bold mb-4 text-gray-800">Take a Photo</h3>
-          <div id="camera-view">
-            <video id="camera-feed" autoplay playsinline class="w-full mb-4 rounded-lg border border-gray-200"></video>
-          </div>
-          <div id="preview-view" class="hidden">
-            <img id="capture-preview" class="w-full mb-4 rounded-lg border border-gray-200">
-          </div>
-          <div class="flex space-x-4" id="camera-controls">
-            <button id="capture-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition">
-              <i class="fas fa-camera mr-2"></i>Capture
-            </button>
-            <button id="close-camera" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
-              <i class="fas fa-times mr-2"></i>Close
-            </button>
-          </div>
-          <div class="flex space-x-4 hidden" id="preview-controls">
-            <button id="retake-btn" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
-              <i class="fas fa-redo mr-2"></i>Retake
-            </button>
-            <button id="upload-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
-              <i class="fas fa-upload mr-2"></i>Upload
-            </button>
-          </div>
-        </div>
-      `;
+                <div class="bg-white rounded-xl p-6 w-full max-w-md">
+                    <h3 class="text-xl font-bold mb-4 text-center">Take a Photo</h3>
+                    
+                    <div id="camera-view">
+                        <video id="camera-feed" autoplay playsinline class="w-full rounded-lg mb-4"></video>
+                    </div>
+                    
+                    <div id="preview-view" class="hidden">
+                        <img id="capture-preview" class="w-full rounded-lg mb-4" />
+                    </div>
+                    
+                    <div id="camera-controls" class="flex gap-3">
+                        <button id="capture-btn" class="flex-1 bg-teal text-white py-3 rounded-lg font-medium">
+                            📸 Capture
+                        </button>
+                        <button id="close-camera" class="px-4 py-3 border border-gray-300 rounded-lg">
+                            ✕
+                        </button>
+                    </div>
+                    
+                    <div id="preview-controls" class="flex gap-3 hidden">
+                        <button id="retake-btn" class="flex-1 bg-gray-500 text-white py-3 rounded-lg">
+                            🔄 Retake
+                        </button>
+                        <button id="upload-btn" class="flex-1 bg-teal text-white py-3 rounded-lg">
+                            ✓ Upload
+                        </button>
+                    </div>
+                </div>
+            `;
 
       document.body.appendChild(modal);
       document.body.style.overflow = "hidden";
@@ -224,14 +233,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Show loading state
     detectedItems.innerHTML = `
-      <div class="space-y-3 text-center py-4">
-        <div class="animate-pulse flex flex-col items-center">
-          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-          <p class="text-teal font-medium">Analyzing sample image...</p>
-          <p class="text-teal-light">Please wait while we process the image</p>
-        </div>
-      </div>
-    `;
+            <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div>
+                    <p class="font-medium text-blue-900">Analyzing sample image...</p>
+                    <p class="text-sm text-blue-600">Please wait while we process the image</p>
+                </div>
+            </div>
+        `;
 
     try {
       // Fetch the sample image
@@ -241,6 +250,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       reader.onload = async function () {
         const base64Image = reader.result.split(",")[1];
+        currentImageBase64 = base64Image; // ✅ Store for background preloading
+
+        // ✅ Start background preloading immediately
+        startBackgroundPreloading(base64Image);
+
         const description = await getImageDescription(base64Image);
         displayDescription(description);
       };
@@ -248,23 +262,60 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
       console.error("Error with sample image:", error);
       detectedItems.innerHTML = `
-        <div class="text-red-500 text-center py-4">
-          <i class="fas fa-exclamation-circle mr-2"></i>
-          Failed to analyze sample image. Please try again.
-        </div>
-      `;
+                <div class="p-4 bg-red-50 rounded-lg">
+                    <p class="text-red-600">Failed to analyze sample image. Please try again.</p>
+                </div>
+            `;
     }
   });
 
-  // Find products button - UPDATED VERSION
+  // ✅ NEW: Background preloading function
+  async function startBackgroundPreloading(base64Image) {
+    if (preloadingInProgress) return;
+
+    preloadingInProgress = true;
+    console.log("🚀 Starting background preloading...");
+
+    try {
+      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageBase64: `data:image/jpeg;base64,${base64Image}`,
+        }),
+      });
+
+      if (response.ok) {
+        preloadedRecommendations = await response.json();
+        console.log("✅ Background preloading completed successfully!");
+      } else {
+        console.log("⚠️ Background preloading failed, will retry on demand");
+        preloadedRecommendations = null;
+      }
+    } catch (error) {
+      console.log("⚠️ Background preloading error:", error.message);
+      preloadedRecommendations = null;
+    } finally {
+      preloadingInProgress = false;
+    }
+  }
+
+  // ✅ UPDATED: Find products button with smart loading
   findProductsBtn.addEventListener("click", async () => {
-    findProductsBtn.innerHTML =
-      '<i class="fas fa-spinner fa-spin mr-2"></i> Searching...';
+    findProductsBtn.innerHTML = "🔍 Searching...";
     findProductsBtn.disabled = true;
 
     try {
-      await showResults();
-      await showRecommendations();
+      // ✅ Show immediate results if preloaded, otherwise show 7-second loader
+      if (preloadedRecommendations && preloadedRecommendations.products) {
+        console.log("⚡ Using preloaded recommendations!");
+        await showPreloadedResults();
+      } else {
+        console.log("⏳ No preloaded data, showing 7-second loader...");
+        await showResultsWithLoader();
+      }
 
       // Smooth scroll to results
       resultsSection.scrollIntoView({ behavior: "smooth" });
@@ -273,21 +324,195 @@ document.addEventListener("DOMContentLoaded", function () {
       // Show error to user
       const resultsContainer = resultsSection.querySelector(".grid");
       resultsContainer.innerHTML = `
-        <div class="col-span-full text-center py-8">
-          <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
-          <p class="text-red-500 font-medium">Failed to load products</p>
-          <p class="text-teal-light">Please try again later</p>
-        </div>
-      `;
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600 mb-2">Failed to load products</p>
+                    <p class="text-sm text-gray-500">Please try again later</p>
+                </div>
+            `;
       resultsSection.classList.remove("hidden");
     } finally {
-      findProductsBtn.innerHTML =
-        '<i class="fas fa-search mr-2"></i>Find Matching Products';
+      findProductsBtn.innerHTML = "Find Matching Products";
       findProductsBtn.disabled = false;
     }
   });
 
-  // Handle image upload
+  // ✅ NEW: Show preloaded results instantly
+  async function showPreloadedResults() {
+    const resultsContainer = resultsSection.querySelector(".grid");
+    const recommendationsContainer =
+      recommendationsSection.querySelector(".grid");
+
+    // Show both sections immediately with preloaded data
+    resultsSection.classList.remove("hidden");
+    recommendationsSection.classList.remove("hidden");
+
+    const products = preloadedRecommendations.products || [];
+
+    // Populate "Recommended For You" section
+    if (products.length > 0) {
+      resultsContainer.innerHTML = "";
+      products.slice(0, 3).forEach((product) => {
+        const productCard = createProductCard(product);
+        resultsContainer.appendChild(productCard);
+      });
+    } else {
+      resultsContainer.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600 mb-2">No matching products found</p>
+                    <p class="text-sm text-gray-500">Try uploading a different image</p>
+                </div>
+            `;
+    }
+
+    // Populate "Recommended Products" section
+    if (products.length > 0) {
+      recommendationsContainer.innerHTML = "";
+      products.forEach((product) => {
+        const recommendationCard = createProductCard(product);
+        recommendationsContainer.appendChild(recommendationCard);
+      });
+    } else {
+      recommendationsContainer.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600 mb-2">No recommendations found</p>
+                    <p class="text-sm text-gray-500">Try uploading a different image</p>
+                </div>
+            `;
+    }
+  }
+
+  // ✅ NEW: Show results with 7-second loader animation
+  async function showResultsWithLoader() {
+    const resultsContainer = resultsSection.querySelector(".grid");
+    const recommendationsContainer =
+      recommendationsSection.querySelector(".grid");
+
+    // Show loading states
+    resultsContainer.innerHTML = `
+            <div class="col-span-full flex items-center justify-center py-12">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal mx-auto mb-4"></div>
+                    <p class="text-gray-600">Finding matching products...</p>
+                    <p class="text-sm text-gray-500">This may take a few moments</p>
+                </div>
+            </div>
+        `;
+
+    recommendationsContainer.innerHTML = `
+            <div class="col-span-full flex items-center justify-center py-12">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal mx-auto mb-4"></div>
+                    <p class="text-gray-600">Finding style recommendations...</p>
+                </div>
+            </div>
+        `;
+
+    resultsSection.classList.remove("hidden");
+    recommendationsSection.classList.remove("hidden");
+
+    // ✅ 7-second delay simulation while making actual API call
+    const [_, actualResults] = await Promise.all([
+      new Promise((resolve) => setTimeout(resolve, 7000)), // 7-second delay
+      fetchRecommendationsFromAPI(), // Actual API call
+    ]);
+
+    // Show real results after delay
+    if (
+      actualResults &&
+      actualResults.products &&
+      actualResults.products.length > 0
+    ) {
+      // Populate "Recommended For You" section
+      resultsContainer.innerHTML = "";
+      actualResults.products.slice(0, 3).forEach((product) => {
+        const productCard = createProductCard(product);
+        resultsContainer.appendChild(productCard);
+      });
+
+      // Populate "Recommended Products" section
+      recommendationsContainer.innerHTML = "";
+      actualResults.products.forEach((product) => {
+        const recommendationCard = createProductCard(product);
+        recommendationsContainer.appendChild(recommendationCard);
+      });
+    } else {
+      // Show no results message
+      const noResultsHTML = `
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600 mb-2">No matching products found</p>
+                    <p class="text-sm text-gray-500">Try uploading a different image</p>
+                </div>
+            `;
+      resultsContainer.innerHTML = noResultsHTML;
+      recommendationsContainer.innerHTML = noResultsHTML;
+    }
+  }
+
+  // ✅ NEW: Fetch recommendations from API
+  async function fetchRecommendationsFromAPI() {
+    try {
+      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageBase64: `data:image/jpeg;base64,${currentImageBase64}`,
+        }),
+      });
+
+      if (response.ok) {
+        return await response.json();
+      } else {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+    } catch (error) {
+      console.error("API fetch error:", error);
+      return null;
+    }
+  }
+
+  // ✅ NEW: Create product card helper function
+  function createProductCard(product) {
+    const productCard = document.createElement("div");
+    productCard.className =
+      "product-card bg-white rounded-xl overflow-hidden fade-in";
+
+    let productUrl = "#";
+    if (product.URL) {
+      try {
+        productUrl = new URL(product.URL).href;
+      } catch (e) {
+        productUrl = product.URL.startsWith("www.")
+          ? `https://${product.URL}`
+          : product.URL;
+      }
+    }
+
+    productCard.innerHTML = `
+            <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                <img src="${product.Image || "/api/placeholder/300/300"}" 
+                     alt="${product.Product || "Product"}" 
+                     class="w-full h-full object-cover"
+                     onerror="this.src='/api/placeholder/300/300'">
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${
+                  product.Product || "Product"
+                }</h3>
+                <p class="text-xl font-bold text-teal mb-3">₹${
+                  product.Price || "N/A"
+                }</p>
+                <a href="${productUrl}" target="_blank" 
+                   class="block w-full bg-teal text-white text-center py-2 rounded-lg hover:bg-teal-dark transition-colors">
+                    View Product
+                </a>
+            </div>
+        `;
+    return productCard;
+  }
+
+  // ✅ UPDATED: Handle image upload with background preloading
   async function handleImageUpload(file) {
     if (!file.type.match("image.*")) {
       alert("Please select an image file");
@@ -301,20 +526,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Show loading state
       detectedItems.innerHTML = `
-        <div class="space-y-3 text-center py-4">
-          <div class="animate-pulse flex flex-col items-center">
-            <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-            <p class="text-teal font-medium">Analyzing image...</p>
-            <p class="text-teal-light">Please wait while we process your image</p>
-          </div>
-        </div>
-      `;
+                <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <div>
+                        <p class="font-medium text-blue-900">Analyzing image...</p>
+                        <p class="text-sm text-blue-600">Please wait while we process your image</p>
+                    </div>
+                </div>
+            `;
 
       try {
         // Convert image to base64
         const base64Image = e.target.result.split(",")[1];
+        currentImageBase64 = base64Image; // ✅ Store for background preloading
 
-        // Call the API
+        // ✅ Start background preloading immediately
+        startBackgroundPreloading(base64Image);
+
+        // Call the API for description
         const description = await getImageDescription(base64Image);
 
         // Display the description
@@ -322,11 +551,10 @@ document.addEventListener("DOMContentLoaded", function () {
       } catch (error) {
         console.error("Error:", error);
         detectedItems.innerHTML = `
-          <div class="text-red-500 text-center py-4">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            Failed to analyze image. Please try again.
-          </div>
-        `;
+                    <div class="p-4 bg-red-50 rounded-lg">
+                        <p class="text-red-600">Failed to analyze image. Please try again.</p>
+                    </div>
+                `;
       }
     };
     reader.readAsDataURL(file);
@@ -337,14 +565,14 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       // First update to "Describing image..."
       detectedItems.innerHTML = `
-        <div class="space-y-3 text-center py-4">
-          <div class="animate-pulse flex flex-col items-center">
-            <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-            <p class="text-teal font-medium">Describing image...</p>
-            <p class="text-teal-light">Almost done!</p>
-          </div>
-        </div>
-      `;
+                <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <div>
+                        <p class="font-medium text-blue-900">Describing image...</p>
+                        <p class="text-sm text-blue-600">Almost done!</p>
+                    </div>
+                </div>
+            `;
 
       const response = await fetch(API_ENDPOINT, {
         method: "POST",
@@ -374,15 +602,15 @@ document.addEventListener("DOMContentLoaded", function () {
       .filter((point) => point.trim() !== "");
 
     // Create HTML for the description
-    let descriptionHTML = '<div class="space-y-3">';
+    let descriptionHTML = '<div class="space-y-2">';
 
     descriptionPoints.forEach((point) => {
       descriptionHTML += `
-        <div class="flex items-center">
-          <div class="w-3 h-3 rounded-full bg-teal mr-2 flex-shrink-0"></div>
-          <span class="font-medium text-indigo-dark">${point}</span>
-        </div>
-      `;
+                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-2 h-2 bg-teal rounded-full mt-2 flex-shrink-0"></div>
+                    <p class="text-gray-700">${point}</p>
+                </div>
+            `;
     });
 
     descriptionHTML += "</div>";
@@ -396,176 +624,9 @@ document.addEventListener("DOMContentLoaded", function () {
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
   }
-  async function showResults() {
-    const resultsContainer = resultsSection.querySelector(".grid");
-    resultsContainer.innerHTML = `
-    <div class="col-span-full text-center py-8">
-      <div class="animate-pulse flex flex-col items-center">
-        <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-        <p class="text-teal font-medium">Finding matching products...</p>
-      </div>
-    </div>
-  `;
-    resultsSection.classList.remove("hidden");
 
-    try {
-      const base64Image = previewImage.src.split(",")[1];
+  // Legacy functions removed - using new unified approach above
 
-      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageBase64: `data:image/jpeg;base64,${base64Image}`,
-        }),
-      });
-
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok || !result.products) {
-        throw new Error(result.message || "Failed to fetch product results");
-      }
-
-      if (result.products.length === 0) {
-        resultsContainer.innerHTML = `
-        <div class="col-span-full text-center py-8">
-          <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
-          <p class="text-teal font-medium">No matching products found</p>
-          <p class="text-teal-light">Try uploading a different image</p>
-        </div>
-      `;
-        return;
-      }
-
-      resultsContainer.innerHTML = "";
-
-      result.products.slice(0, 3).forEach((product) => {
-        const productCard = document.createElement("div");
-        productCard.className =
-          "product-card bg-white rounded-xl overflow-hidden fade-in";
-
-        let productUrl = "#";
-        if (product.URL) {
-          try {
-            productUrl = new URL(product.URL).href;
-          } catch (e) {
-            productUrl = product.URL.startsWith("www.")
-              ? `https://${product.URL}`
-              : product.URL;
-          }
-        }
-
-        productCard.innerHTML = `
-        <img src="${product.Image || "https://via.placeholder.com/300x300"}"
-             alt="${product.Product || "Product"}"
-             class="w-full h-60 object-cover"
-             onerror="this.src='https://via.placeholder.com/300x300'">
-        <div class="p-4">
-          <h3 class="font-medium text-indigo-dark mb-1">${
-            product.Product || "Product"
-          }</h3>
-          <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
-          <a href="${productUrl}" target="_blank"
-             class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
-            <i class="fas fa-shopping-cart mr-2"></i>View Product
-          </a>
-        </div>
-      `;
-        resultsContainer.appendChild(productCard);
-      });
-    } catch (error) {
-      console.error("Error showing results:", error);
-      resultsContainer.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
-        <p class="text-red-500 font-medium">${error.message}</p>
-        <p class="text-teal-light">Please try again later</p>
-      </div>
-    `;
-    }
-  }
-
-  async function showRecommendations() {
-    const recommendationsContainer =
-      recommendationsSection.querySelector(".grid");
-    recommendationsContainer.innerHTML = `
-    <div class="col-span-full text-center py-8">
-      <div class="animate-pulse flex flex-col items-center">
-        <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-        <p class="text-teal font-medium">Finding style recommendations...</p>
-      </div>
-    </div>
-  `;
-    recommendationsSection.classList.remove("hidden");
-
-    try {
-      const base64Image = previewImage.src.split(",")[1];
-
-      const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageBase64: `data:image/jpeg;base64,${base64Image}`,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-
-      const { products } = await response.json();
-
-      if (!products || products.length === 0) {
-        recommendationsContainer.innerHTML = `
-        <div class="col-span-full text-center py-8">
-          <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
-          <p class="text-teal font-medium">No recommendations found</p>
-          <p class="text-teal-light">Try uploading a different image</p>
-        </div>
-      `;
-        return;
-      }
-
-      recommendationsContainer.innerHTML = "";
-
-      products.forEach((product) => {
-        const recommendationCard = document.createElement("div");
-        recommendationCard.className =
-          "product-card bg-white rounded-xl overflow-hidden fade-in";
-        recommendationCard.innerHTML = `
-        <img src="${product.Image || "https://via.placeholder.com/300x300"}"
-             alt="${product.Product}" 
-             class="w-full h-48 object-cover"
-             onerror="this.src='https://via.placeholder.com/300x300'">
-        <div class="p-4">
-          <h3 class="font-medium text-indigo-dark mb-1">${
-            product.Product || "Product"
-          }</h3>
-          <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
-          <a href="${product.URL || "#"}" target="_blank"
-             class="block w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center"
-             style="background-color: var(--green);">
-            <i class="fas fa-shopping-cart mr-2"></i>Click to Buy
-
-          </a>
-        </div>
-      `;
-        recommendationsContainer.appendChild(recommendationCard);
-      });
-    } catch (error) {
-      console.error("Error showing recommendations:", error);
-      recommendationsContainer.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
-        <p class="text-red-500 font-medium">${error.message}</p>
-        <p class="text-teal-light">Please try again later</p>
-      </div>
-    `;
-    }
-  }
   // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
   const navbar = document.querySelector(".glass-navbar");
 
