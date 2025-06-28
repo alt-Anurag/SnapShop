@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const API_ENDPOINT = "/.netlify/functions/describe-image";
   const RECOMMENDATIONS_ENDPOINT = "/.netlify/functions/recommend-products";
 
-  // ✅ NEW: Global variables for background preloading
+  // ✅ Global variables for background preloading
   let preloadedRecommendations = null;
   let preloadingInProgress = false;
   let currentImageBase64 = null;
@@ -107,121 +107,12 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("load", enforceMobileLayout);
   window.addEventListener("resize", enforceMobileLayout);
 
-  // Camera button - NEW IMPLEMENTATION
-  cameraBtn.addEventListener("click", async () => {
-    try {
-      // Create camera modal
-      const modal = document.createElement("div");
-      modal.className =
-        "fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4";
-      modal.innerHTML = `
-                <div class="bg-white rounded-xl p-6 w-full max-w-md">
-                    <h3 class="text-xl font-bold mb-4 text-center">Take a Photo</h3>
-                    
-                    <div id="camera-view">
-                        <video id="camera-feed" autoplay playsinline class="w-full rounded-lg mb-4"></video>
-                    </div>
-                    
-                    <div id="preview-view" class="hidden">
-                        <img id="capture-preview" class="w-full rounded-lg mb-4" />
-                    </div>
-                    
-                    <div id="camera-controls" class="flex gap-3">
-                        <button id="capture-btn" class="flex-1 bg-teal text-white py-3 rounded-lg font-medium">
-                            📸 Capture
-                        </button>
-                        <button id="close-camera" class="px-4 py-3 border border-gray-300 rounded-lg">
-                            ✕
-                        </button>
-                    </div>
-                    
-                    <div id="preview-controls" class="flex gap-3 hidden">
-                        <button id="retake-btn" class="flex-1 bg-gray-500 text-white py-3 rounded-lg">
-                            🔄 Retake
-                        </button>
-                        <button id="upload-btn" class="flex-1 bg-teal text-white py-3 rounded-lg">
-                            ✓ Upload
-                        </button>
-                    </div>
-                </div>
-            `;
-
-      document.body.appendChild(modal);
-      document.body.style.overflow = "hidden";
-
-      // Start camera stream
-      const video = document.getElementById("camera-feed");
-      let stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-      video.srcObject = stream;
-
-      // Capture button
-      document.getElementById("capture-btn").addEventListener("click", () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext("2d").drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL("image/jpeg");
-
-        // Show preview
-        document.getElementById("camera-view").classList.add("hidden");
-        document.getElementById("preview-view").classList.remove("hidden");
-        document.getElementById("camera-controls").classList.add("hidden");
-        document.getElementById("preview-controls").classList.remove("hidden");
-        document.getElementById("capture-preview").src = imageData;
-      });
-
-      // Retake button
-      document.getElementById("retake-btn").addEventListener("click", () => {
-        document.getElementById("camera-view").classList.remove("hidden");
-        document.getElementById("preview-view").classList.add("hidden");
-        document.getElementById("camera-controls").classList.remove("hidden");
-        document.getElementById("preview-controls").classList.add("hidden");
-      });
-
-      // Upload button
-      document.getElementById("upload-btn").addEventListener("click", () => {
-        const imageData = document.getElementById("capture-preview").src;
-
-        // Convert base64 to Blob (simulating file upload)
-        fetch(imageData)
-          .then((res) => res.blob())
-          .then((blob) => {
-            const file = new File([blob], "capture.jpg", {
-              type: "image/jpeg",
-            });
-
-            // Simulate file input change event
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-
-            // Trigger file upload handler
-            const event = new Event("change");
-            fileInput.dispatchEvent(event);
-
-            // Cleanup
-            stream.getTracks().forEach((track) => track.stop());
-            document.body.style.overflow = "";
-            modal.remove();
-          });
-      });
-
-      // Close button
-      document.getElementById("close-camera").addEventListener("click", () => {
-        stream.getTracks().forEach((track) => track.stop());
-        document.body.style.overflow = "";
-        modal.remove();
-      });
-    } catch (error) {
-      console.error("Camera error:", error);
-      alert("Could not access camera. Please check permissions.");
-    }
+  // ✅ REVERTED: Original camera button implementation from backup
+  cameraBtn.addEventListener("click", () => {
+    // Set the file input to accept images and use camera
+    fileInput.setAttribute("capture", "environment");
+    fileInput.setAttribute("accept", "image/*");
+    fileInput.click();
   });
 
   // Sample button
@@ -269,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ✅ NEW: Background preloading function
+  // ✅ Background preloading function
   async function startBackgroundPreloading(base64Image) {
     if (preloadingInProgress) return;
 
@@ -302,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ UPDATED: Find products button with smart loading
+  // ✅ UPDATED: Find products button - Only shows Recommended Products section
   findProductsBtn.addEventListener("click", async () => {
     findProductsBtn.innerHTML = "🔍 Searching...";
     findProductsBtn.disabled = true;
@@ -317,54 +208,37 @@ document.addEventListener("DOMContentLoaded", function () {
         await showResultsWithLoader();
       }
 
-      // Smooth scroll to results
-      resultsSection.scrollIntoView({ behavior: "smooth" });
+      // Smooth scroll to recommendations section only
+      recommendationsSection.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error finding products:", error);
       // Show error to user
-      const resultsContainer = resultsSection.querySelector(".grid");
-      resultsContainer.innerHTML = `
+      const recommendationsContainer =
+        recommendationsSection.querySelector(".grid");
+      recommendationsContainer.innerHTML = `
                 <div class="col-span-full text-center py-8">
                     <p class="text-gray-600 mb-2">Failed to load products</p>
                     <p class="text-sm text-gray-500">Please try again later</p>
                 </div>
             `;
-      resultsSection.classList.remove("hidden");
+      recommendationsSection.classList.remove("hidden");
     } finally {
       findProductsBtn.innerHTML = "Find Matching Products";
       findProductsBtn.disabled = false;
     }
   });
 
-  // ✅ NEW: Show preloaded results instantly
+  // ✅ UPDATED: Show preloaded results - Only Recommended Products section
   async function showPreloadedResults() {
-    const resultsContainer = resultsSection.querySelector(".grid");
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
 
-    // Show both sections immediately with preloaded data
-    resultsSection.classList.remove("hidden");
+    // Show only recommendations section immediately with preloaded data
     recommendationsSection.classList.remove("hidden");
 
     const products = preloadedRecommendations.products || [];
 
-    // Populate "Recommended For You" section
-    if (products.length > 0) {
-      resultsContainer.innerHTML = "";
-      products.slice(0, 3).forEach((product) => {
-        const productCard = createProductCard(product);
-        resultsContainer.appendChild(productCard);
-      });
-    } else {
-      resultsContainer.innerHTML = `
-                <div class="col-span-full text-center py-8">
-                    <p class="text-gray-600 mb-2">No matching products found</p>
-                    <p class="text-sm text-gray-500">Try uploading a different image</p>
-                </div>
-            `;
-    }
-
-    // Populate "Recommended Products" section
+    // Populate "Recommended Products" section only
     if (products.length > 0) {
       recommendationsContainer.innerHTML = "";
       products.forEach((product) => {
@@ -381,23 +255,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ NEW: Show results with 7-second loader animation
+  // ✅ UPDATED: Show results with 7-second loader - Only Recommended Products section
   async function showResultsWithLoader() {
-    const resultsContainer = resultsSection.querySelector(".grid");
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
 
-    // Show loading states
-    resultsContainer.innerHTML = `
-            <div class="col-span-full flex items-center justify-center py-12">
-                <div class="text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal mx-auto mb-4"></div>
-                    <p class="text-gray-600">Finding matching products...</p>
-                    <p class="text-sm text-gray-500">This may take a few moments</p>
-                </div>
-            </div>
-        `;
-
+    // Show loading state for recommendations section only
     recommendationsContainer.innerHTML = `
             <div class="col-span-full flex items-center justify-center py-12">
                 <div class="text-center">
@@ -407,7 +270,6 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-    resultsSection.classList.remove("hidden");
     recommendationsSection.classList.remove("hidden");
 
     // ✅ 7-second delay simulation while making actual API call
@@ -422,14 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
       actualResults.products &&
       actualResults.products.length > 0
     ) {
-      // Populate "Recommended For You" section
-      resultsContainer.innerHTML = "";
-      actualResults.products.slice(0, 3).forEach((product) => {
-        const productCard = createProductCard(product);
-        resultsContainer.appendChild(productCard);
-      });
-
-      // Populate "Recommended Products" section
+      // Populate "Recommended Products" section only
       recommendationsContainer.innerHTML = "";
       actualResults.products.forEach((product) => {
         const recommendationCard = createProductCard(product);
@@ -437,18 +292,16 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     } else {
       // Show no results message
-      const noResultsHTML = `
+      recommendationsContainer.innerHTML = `
                 <div class="col-span-full text-center py-8">
                     <p class="text-gray-600 mb-2">No matching products found</p>
                     <p class="text-sm text-gray-500">Try uploading a different image</p>
                 </div>
             `;
-      resultsContainer.innerHTML = noResultsHTML;
-      recommendationsContainer.innerHTML = noResultsHTML;
     }
   }
 
-  // ✅ NEW: Fetch recommendations from API
+  // ✅ Fetch recommendations from API
   async function fetchRecommendationsFromAPI() {
     try {
       const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
@@ -472,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ NEW: Create product card helper function
+  // ✅ Create product card helper function
   function createProductCard(product) {
     const productCard = document.createElement("div");
     productCard.className =
@@ -512,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return productCard;
   }
 
-  // ✅ UPDATED: Handle image upload with background preloading
+  // ✅ Handle image upload with background preloading
   async function handleImageUpload(file) {
     if (!file.type.match("image.*")) {
       alert("Please select an image file");
@@ -560,7 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.readAsDataURL(file);
   }
 
-  // SINGLE VERSION OF THIS FUNCTION - ALL OTHERS REMOVED
+  // Get image description from API
   async function getImageDescription(base64Image) {
     try {
       // First update to "Describing image..."
@@ -594,7 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Display the description
+  // Display the description with improved formatting
   function displayDescription(description) {
     // Split the description into bullet points if it contains newlines
     const descriptionPoints = description
@@ -624,8 +477,6 @@ document.addEventListener("DOMContentLoaded", function () {
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
   }
-
-  // Legacy functions removed - using new unified approach above
 
   // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
   const navbar = document.querySelector(".glass-navbar");
