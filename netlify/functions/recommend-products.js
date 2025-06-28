@@ -7,9 +7,9 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzbmJzY3N4c3FycmRnbGxndHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MzI5MzIsImV4cCI6MjA2NjQwODkzMn0.9aFwC1rV0yVYtwnRlQFJQjd-5BRCuUk9tYM-gddArt4"
 );
 
-// Updated Hugging Face API configuration
+// CORRECTED: Use the direct model endpoint for feature extraction.
 const HF_API_URL =
-  "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/clip-vit-base-patch32";
+  "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32";
 const HF_TOKEN = process.env.HF_API_TOKEN;
 
 exports.handler = async (event) => {
@@ -39,18 +39,15 @@ exports.handler = async (event) => {
 
     const imageBuffer = await imageResponse.arrayBuffer();
 
-    // Prepare the Hugging Face API request
+    // CORRECTED: Prepare the Hugging Face API request with binary data
     const hfResponse = await fetch(HF_API_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json",
+        // REMOVED: "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        inputs: {
-          image: Buffer.from(imageBuffer).toString("base64"),
-        },
-      }),
+      // CORRECTED: Send the raw image buffer directly as the body
+      body: imageBuffer,
     });
 
     if (hfResponse.status === 404) {
@@ -66,6 +63,7 @@ exports.handler = async (event) => {
       );
     }
 
+    // The response is the embedding directly
     const embedding = await hfResponse.json();
 
     // Query similar products from Supabase
