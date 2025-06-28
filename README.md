@@ -1,5 +1,6 @@
 # SnapShop 🛍️✨ - AI-Powered Visual Shopping Assistant
 **🚀 Visit Here: https://snapshop-anurag.netlify.app/# 🚀**
+---
 SnapShop is an intelligent visual shopping assistant that transforms the way you discover products. Simply upload an image of an item you like, and SnapShop's AI will identify it, describe its key features, and recommend visually similar products available for purchase from a live database.
 
 ---
