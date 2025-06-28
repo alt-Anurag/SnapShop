@@ -1,7 +1,7 @@
 // netlify/functions/recommend-products.js
 
 import { createClient } from "@supabase/supabase-js";
-import fetch from "node-fetch"; // used for both Supabase and Hugging Face API
+import fetch from "node-fetch";
 
 // ✅ Supabase client
 const supabase = createClient(
@@ -9,8 +9,8 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-// Hugging Face REST token
-const HF_API_TOKEN = process.env.HF_API_TOKEN;
+// ✅ Hugging Face Space endpoint (your deployed FastAPI backend)
+const HF_BACKEND_URL = "https://anurag2416-clip-embed-api.hf.space/recommend";
 
 // ✅ Upload image to Supabase bucket
 async function uploadToBucket(fileBuffer, fileName) {
@@ -31,8 +31,6 @@ async function uploadToBucket(fileBuffer, fileName) {
 }
 
 export const handler = async (event) => {
-  console.log("🔑 Supabase Key Length:", process.env.SUPABASE_ANON_KEY?.length);
-
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -41,61 +39,40 @@ export const handler = async (event) => {
   }
 
   try {
-    if (!HF_API_TOKEN) {
-      throw new Error("Hugging Face API token not configured");
-    }
-
     const body = JSON.parse(event.body);
     const base64Image = body.imageBase64;
     if (!base64Image) throw new Error("No image provided");
 
-    // Convert base64 to buffer for upload
+    // Convert base64 to buffer
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
 
     // ✅ Upload to Supabase
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // ✅ Use Hugging Face Inference REST API (no SDK issues!)
-    const hfResponse = await fetch(
-      "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base"
-,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${HF_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          inputs: base64Image,
-        }),
-      }
-    );
+    // ✅ Send to Hugging Face backend
+    const hfResponse = await fetch(HF_BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        match_threshold: 0.65,
+        match_count: 5,
+      }),
+    });
 
     if (!hfResponse.ok) {
       const err = await hfResponse.json().catch(() => ({}));
-      throw new Error(
-        `Hugging Face error: ${err.error || hfResponse.statusText}`
-      );
+      throw new Error(`Hugging Face API error: ${err.detail || hfResponse.statusText}`);
     }
 
-    const embedding = await hfResponse.json();
-
-    // ✅ Query Supabase RPC function for similar products
-    const { data, error: rpcError } = await supabase.rpc("similar_products", {
-      query_embedding: embedding,
-      match_threshold: 0.25,
-      match_count: 5,
-    });
-
-    if (rpcError) throw rpcError;
+    const result = await hfResponse.json();
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        products: data || [],
-        imageUrl,
-        message: "Recommendations retrieved",
+        ...result,
+        message: "Successfully retrieved recommendations from HF backend",
       }),
     };
   } catch (err) {
