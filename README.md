@@ -48,7 +48,7 @@ A complete serverless, AI-driven stack:
 | **Database**      | ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white) (Postgres with `pgvector` for vector search & Storage for image hosting)                                                                                                                     |
 | **Deployment**    | ![Netlify](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)                                                                                                                                                                                                |
 
-## Application Flow & Pipeline
+# **Application Flow & Pipeline**
 
 The project follows a sophisticated, multi-step pipeline to deliver recommendations.
 
@@ -123,7 +123,7 @@ Netlify Function (already preloaded)
 ---
 
 
-## Performance Optimization: Solving the Cold Start Problem
+# Performance Optimization: Solving the Cold Start Problem
 
 A key challenge with free-tier serverless functions and ML models is **"cold starts"**—the initial delay while the service wakes up. This caused the first recommendation attempt to fail 90% of the time, leading to a 30-60 second wait for the user.
 
@@ -136,17 +136,17 @@ I re-architected the frontend logic to initiate the entire recommendation pipeli
 
 This means that while the user is reading the AI-generated description (3-5 seconds), the much longer recommendation process (15-25 seconds) is already happening. When the user clicks "Find Matching Products", the results are often already available and are displayed instantly, providing a seamless and responsive experience.
 
-## Getting Started
+# Getting Started
 
 To get a local copy up and running, follow these simple steps.
 
-### Prerequisites
+# Prerequisites
 
 -   Node.js (v18 or later)
 -   npm (or yarn/pnpm)
 -   Netlify CLI: `npm install netlify-cli -g`
 
-### Installation
+## Installation
 
 1.  **Clone the repository:**
     ```
@@ -172,7 +172,7 @@ To get a local copy up and running, follow these simple steps.
     ```
     Your application will be available at `http://localhost:8888`.
 
-## Configuration
+# Configuration
 
 Your `.env` file must contain the following keys:
 
@@ -184,7 +184,7 @@ Your `.env` file must contain the following keys:
 | `HF_API_URL`                 | The full URL to your custom Hugging Face Space API endpoint for embeddings. | `https://your-username-your-space.hf.space/embed` |
 | `SUPABASE_BUCKET_PUBLIC_URL` | The public URL prefix for your Supabase Storage bucket.                  | `https://xyz.supabase.co/storage/v1/object/public`  |
 
-## Project Structure
+# Project Structure
 
 ```
 .
@@ -198,9 +198,9 @@ Your `.env` file must contain the following keys:
 └── README.md                # You are here
 ```
 
-## Contact
+# Contact
 
-Anurag - [@Anurag](https://www.linkedin.com/in/anurag-upadhyay-a56637213/) - anuragupadhyay2002@gmail.com
+Anurag - anuragjha7516@gmail.com
 
-Project Link: [https://github.com/alt-Anurag/SnapShop](https://github.com/alt-Anurag/SnapShop)
+Project Link: [https://github.com/alt-Anurag/SnapShop]
 ```
