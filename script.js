@@ -328,45 +328,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // ✅ Create product card helper function
   function createProductCard(product) {
     const productCard = document.createElement("div");
-    productCard.className = "product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 fade-in";
+    productCard.className =
+      "product-card bg-white rounded-xl overflow-hidden fade-in";
 
-    // Handle product URL properly
     let productUrl = "#";
     if (product.URL) {
-        try {
-            // If it's already a full URL, use it as is
-            productUrl = new URL(product.URL).href;
-        } catch (e) {
-            // If it's not a full URL, try to make it one
-            if (product.URL.startsWith("www.")) {
-                productUrl = `https://${product.URL}`;
-            } else if (product.URL.startsWith("http")) {
-                productUrl = product.URL;
-            } else {
-                productUrl = `https://${product.URL}`;
-            }
-        }
+      try {
+        productUrl = new URL(product.URL).href;
+      } catch (e) {
+        productUrl = product.URL.startsWith("www.")
+          ? `https://${product.URL}`
+          : product.URL;
+      }
     }
-
-    productCard.innerHTML = `
-        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-            <img src="${product.Image || '/api/placeholder/300/300'}" 
-                 alt="${product.Product || 'Product'}" 
-                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                 onerror="this.src='/api/placeholder/300/300'">
-        </div>
-        <div class="p-4">
-            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.Product || "Product"}</h3>
-            <p class="text-xl font-bold text-teal mb-3">₹${product.Price || "N/A"}</p>
-            <a href="${productUrl}" target="_blank" 
-               class="block w-full bg-gradient-to-r from-teal to-teal-dark text-white text-center py-3 px-4 rounded-lg font-medium hover:from-teal-dark hover:to-teal transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg">
-                🛒 Click to Buy
-            </a>
-        </div>
-    `;
-    return productCard;
-}
-
 
     productCard.innerHTML = `
             <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
