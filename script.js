@@ -396,7 +396,6 @@ document.addEventListener("DOMContentLoaded", function () {
     previewSection.classList.remove("hidden");
     previewSection.classList.add("fade-in");
   }
-  // Show results - UPDATED VERSION with better error handling
   async function showResults() {
     const resultsContainer = resultsSection.querySelector(".grid");
     resultsContainer.innerHTML = `
@@ -407,42 +406,28 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     </div>
   `;
-
     resultsSection.classList.remove("hidden");
 
     try {
-      // Get recommendations for the current preview image
+      const base64Image = previewImage.src.split(",")[1];
+
       const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ imageUrl: previewImage.src }),
+        body: JSON.stringify({
+          imageBase64: `data:image/jpeg;base64,${base64Image}`,
+        }),
       });
 
-      // Parse response and handle errors
       const result = await response.json().catch(() => ({}));
 
-      if (!response.ok) {
-        // Handle different types of errors with specific messages
-        let errorMessage = "Failed to get recommendations";
-
-        if (response.status === 404) {
-          errorMessage = "Recommendation service is currently unavailable";
-        } else if (response.status === 401) {
-          errorMessage = "Authentication failed - please refresh the page";
-        } else if (result.error) {
-          errorMessage = result.error;
-        } else if (result.message) {
-          errorMessage = result.message;
-        } else {
-          errorMessage = `API request failed with status ${response.status}`;
-        }
-
-        throw new Error(errorMessage);
+      if (!response.ok || !result.products) {
+        throw new Error(result.message || "Failed to fetch product results");
       }
 
-      if (!result.products || result.products.length === 0) {
+      if (result.products.length === 0) {
         resultsContainer.innerHTML = `
         <div class="col-span-full text-center py-8">
           <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
@@ -453,16 +438,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Clear loading state
       resultsContainer.innerHTML = "";
 
-      // Display actual products
       result.products.slice(0, 3).forEach((product) => {
         const productCard = document.createElement("div");
         productCard.className =
           "product-card bg-white rounded-xl overflow-hidden fade-in";
 
-        // Create product URL with fallback and validation
         let productUrl = "#";
         if (product.URL) {
           try {
@@ -475,21 +457,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         productCard.innerHTML = `
-        <img src="${
-          product.Image ||
-          "https://via.placeholder.com/300x300?text=Product+Image"
-        }" 
-             alt="${product.Product || "Product"}" 
+        <img src="${product.Image || "https://via.placeholder.com/300x300"}"
+             alt="${product.Product || "Product"}"
              class="w-full h-60 object-cover"
-             onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
+             onerror="this.src='https://via.placeholder.com/300x300'">
         <div class="p-4">
           <h3 class="font-medium text-indigo-dark mb-1">${
             product.Product || "Product"
           }</h3>
           <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
-          <a href="${productUrl}" 
-             target="_blank" 
-             rel="noopener noreferrer"
+          <a href="${productUrl}" target="_blank"
              class="block w-full bg-indigo-dark text-white py-2 rounded-lg hover:bg-indigo-darker transition duration-300 flex items-center justify-center">
             <i class="fas fa-shopping-cart mr-2"></i>View Product
           </a>
@@ -499,65 +476,40 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     } catch (error) {
       console.error("Error showing results:", error);
-
-      // Determine user-friendly error message
-      let userMessage = error.message || "Please try again later";
-      let technicalDetails = "";
-
-      if (error.message.includes("service is currently unavailable")) {
-        userMessage =
-          "Our recommendation service is temporarily down. We're working to fix it!";
-        technicalDetails =
-          "The recommendation engine API is currently unavailable";
-      } else if (error.message.includes("Authentication failed")) {
-        userMessage = "Session expired - please refresh the page";
-        technicalDetails = "Authentication token invalid or expired";
-      }
-
       resultsContainer.innerHTML = `
       <div class="col-span-full text-center py-8">
         <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
-        <p class="text-red-500 font-medium">${userMessage}</p>
-        <p class="text-teal-light">${
-          technicalDetails || "Please check your connection and try again"
-        }</p>
-        ${
-          process.env.NODE_ENV === "development"
-            ? `<p class="text-xs text-gray-500 mt-2">Technical: ${error.message}</p>`
-            : ""
-        }
+        <p class="text-red-500 font-medium">${error.message}</p>
+        <p class="text-teal-light">Please try again later</p>
       </div>
     `;
-
-      // Only rethrow if you want the error to be caught by a parent function
-      if (process.env.NODE_ENV === "development") {
-        throw error;
-      }
     }
   }
-  // Show recommendations - UPDATED VERSION
+
   async function showRecommendations() {
     const recommendationsContainer =
       recommendationsSection.querySelector(".grid");
     recommendationsContainer.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <div class="animate-pulse flex flex-col items-center">
-          <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
-          <p class="text-teal font-medium">Finding style recommendations...</p>
-        </div>
+    <div class="col-span-full text-center py-8">
+      <div class="animate-pulse flex flex-col items-center">
+        <i class="fas fa-spinner fa-spin text-2xl text-teal mb-2"></i>
+        <p class="text-teal font-medium">Finding style recommendations...</p>
       </div>
-    `;
-
+    </div>
+  `;
     recommendationsSection.classList.remove("hidden");
 
     try {
-      // Get recommendations for the current preview image
+      const base64Image = previewImage.src.split(",")[1];
+
       const response = await fetch(RECOMMENDATIONS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ imageUrl: previewImage.src }),
+        body: JSON.stringify({
+          imageBase64: `data:image/jpeg;base64,${base64Image}`,
+        }),
       });
 
       if (!response.ok) {
@@ -568,53 +520,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!products || products.length === 0) {
         recommendationsContainer.innerHTML = `
-          <div class="col-span-full text-center py-8">
-            <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
-            <p class="text-teal font-medium">No recommendations found</p>
-            <p class="text-teal-light">Try uploading a different image</p>
-          </div>
-        `;
+        <div class="col-span-full text-center py-8">
+          <i class="fas fa-exclamation-circle text-2xl text-teal mb-2"></i>
+          <p class="text-teal font-medium">No recommendations found</p>
+          <p class="text-teal-light">Try uploading a different image</p>
+        </div>
+      `;
         return;
       }
 
-      // Clear loading state
       recommendationsContainer.innerHTML = "";
 
-      // Display actual recommendations (show all products as recommendations)
       products.forEach((product) => {
         const recommendationCard = document.createElement("div");
         recommendationCard.className =
           "product-card bg-white rounded-xl overflow-hidden fade-in";
         recommendationCard.innerHTML = `
-          <img src="${
-            product.Image ||
-            "https://via.placeholder.com/300x300?text=Product+Image"
-          }" 
-               alt="${product.Product}" 
-               class="w-full h-48 object-cover"
-               onerror="this.src='https://via.placeholder.com/300x300?text=Product+Image'">
-          <div class="p-4">
-            <h3 class="font-medium text-indigo-dark mb-1">${
-              product.Product || "Product"
-            }</h3>
-            <p class="text-teal font-semibold mb-3">₹${
-              product.Price || "N/A"
-            }</p>
-            <a href="${
-              product.URL || "#"
-            }" target="_blank" class="block w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center" style="background-color: var(--green);">
-              <i class="fas fa-plus mr-2"></i>Add to Style
-            </a>
-          </div>
-        `;
+        <img src="${product.Image || "https://via.placeholder.com/300x300"}"
+             alt="${product.Product}" 
+             class="w-full h-48 object-cover"
+             onerror="this.src='https://via.placeholder.com/300x300'">
+        <div class="p-4">
+          <h3 class="font-medium text-indigo-dark mb-1">${
+            product.Product || "Product"
+          }</h3>
+          <p class="text-teal font-semibold mb-3">₹${product.Price || "N/A"}</p>
+          <a href="${product.URL || "#"}" target="_blank"
+             class="block w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center"
+             style="background-color: var(--green);">
+            <i class="fas fa-plus mr-2"></i>Add to Style
+          </a>
+        </div>
+      `;
         recommendationsContainer.appendChild(recommendationCard);
       });
     } catch (error) {
       console.error("Error showing recommendations:", error);
-      throw error; // Rethrow to be caught by the parent function
+      recommendationsContainer.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
+        <p class="text-red-500 font-medium">${error.message}</p>
+        <p class="text-teal-light">Please try again later</p>
+      </div>
+    `;
     }
   }
-
   // Glass navbar effects - FIXED TO SHOW IMMEDIATELY
   const navbar = document.querySelector(".glass-navbar");
 
