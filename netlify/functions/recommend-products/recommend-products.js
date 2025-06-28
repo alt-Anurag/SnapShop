@@ -21,7 +21,7 @@ async function uploadToBucket(fileBuffer, fileName) {
       upsert: true,
     });
 
-  if (error) throw error;
+  if (error) throw new Error(`Supabase upload failed: ${error.message}`);
 
   const {
     data: { publicUrl },
@@ -41,16 +41,17 @@ export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const base64Image = body.imageBase64;
-    if (!base64Image) throw new Error("No image provided");
 
-    // Convert base64 to buffer
+    if (!base64Image) {
+      throw new Error("No imageBase64 field provided in request.");
+    }
+
+    // ✅ Convert base64 to buffer and upload
     const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
     const fileName = `image_${Date.now()}.jpg`;
-
-    // ✅ Upload to Supabase
     const imageUrl = await uploadToBucket(imageBuffer, fileName);
 
-    // ✅ Send to Hugging Face backend
+    // ✅ Send uploaded Supabase URL to Hugging Face backend
     const hfResponse = await fetch(HF_BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,7 +64,9 @@ export const handler = async (event) => {
 
     if (!hfResponse.ok) {
       const err = await hfResponse.json().catch(() => ({}));
-      throw new Error(`Hugging Face API error: ${err.detail || hfResponse.statusText}`);
+      throw new Error(
+        `Hugging Face API error: ${err.detail || hfResponse.statusText}`
+      );
     }
 
     const result = await hfResponse.json();
@@ -72,7 +75,7 @@ export const handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         ...result,
-        message: "Successfully retrieved recommendations from HF backend",
+        message: "✅ Successfully retrieved recommendations from HF backend",
       }),
     };
   } catch (err) {
