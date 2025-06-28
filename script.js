@@ -548,7 +548,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <a href="${product.URL || "#"}" target="_blank"
              class="block w-full bg-green text-white py-2 rounded-lg hover:bg-green-light transition duration-300 flex items-center justify-center"
              style="background-color: var(--green);">
-            <i class="fas fa-plus mr-2"></i>Add to Style
+            <i class="fas fa-shopping-cart mr-2"></i>Click to Buy
+
           </a>
         </div>
       `;
