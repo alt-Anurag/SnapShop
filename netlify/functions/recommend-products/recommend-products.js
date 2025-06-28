@@ -66,12 +66,12 @@ export const handler = async (event) => {
     }
 
     const arrayBuffer = await imageResponse.arrayBuffer();
-    const imageInput = Buffer.from(arrayBuffer);
+    const imageBase64 = Buffer.from(arrayBuffer).toString("base64");
 
-    // Get embedding from Hugging Face
+    // Send base64 as a string (mimics browser file upload)
     const embedding = await hf.featureExtraction({
       model: "openai/clip-vit-base-patch32",
-      inputs: imageInput,
+      inputs: `data:image/jpeg;base64,${imageBase64}`,
     });
 
     // Call Supabase RPC
