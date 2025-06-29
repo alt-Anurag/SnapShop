@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const base64Image = e.target.result.split(",")[1];
-        currentImageBase64 = base64Image; // ✅ Store for background preloading
+        currentImageBase64 = base64Image;
 
         startBackgroundPreloading(base64Image);
 
@@ -439,7 +439,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function displayDescription(description) {
-    // Split the description into bullet points if it contains newlines
     const descriptionPoints = description
       .split("\n")
       .filter((point) => point.trim() !== "");
@@ -494,5 +493,88 @@ document.addEventListener("DOMContentLoaded", function () {
     navbar.style.backgroundColor = `rgba(255, 255, 255, ${scrollOpacity})`;
 
     lastScrollY = window.scrollY;
+  });
+
+  function initScrollAnimations() {
+    const animateElements = document.querySelectorAll(
+      ".tech-card, .timeline-item"
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fadeInUp");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    animateElements.forEach((el) => observer.observe(el));
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (document.querySelector(".behind-the-tech-page")) {
+      initScrollAnimations();
+    }
+
+    if (document.querySelector(".faqs-page")) {
+      const faqQuestions = document.querySelectorAll(".faq-question");
+
+      faqQuestions.forEach((question) => {
+        question.addEventListener("click", () => {
+          const faqItem = question.parentElement;
+          const answer = question.nextElementSibling;
+
+          // Close all other FAQs
+          faqQuestions.forEach((q) => {
+            if (q !== question) {
+              q.classList.remove("active");
+              q.nextElementSibling.classList.remove("active");
+            }
+          });
+
+          // Toggle current FAQ
+          question.classList.toggle("active");
+          answer.classList.toggle("active");
+
+          // Smooth scroll for mobile to ensure visibility
+          if (window.innerWidth < 768 && answer.classList.contains("active")) {
+            setTimeout(() => {
+              faqItem.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
+            }, 300);
+          }
+        });
+      });
+
+      // Initialize animations for FAQ items
+      const animateFAQItems = () => {
+        const faqItems = document.querySelectorAll(".faq-item");
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("animate-fadeInUp");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        faqItems.forEach((item, index) => {
+          // Add delay based on index for staggered animation
+          item.style.animationDelay = `${index * 0.1}s`;
+          observer.observe(item);
+        });
+      };
+
+      animateFAQItems();
+    }
   });
 });

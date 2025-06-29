@@ -348,3 +348,219 @@ input[type="file"] {
 .text-red-500 {
   color: #ef4444;
 }
+
+.tech-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(95, 93, 156, 0.15);
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-right: auto;
+}
+
+/* FAQ specific styles - UPDATED */
+.faq-item {
+    border: 1px solid rgba(97, 150, 166, 0.2);
+    margin-bottom: 12px;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.faq-question:hover {
+    background-color: rgba(97, 150, 166, 0.05);
+}
+
+.faq-question h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--indigo-dark);
+}
+
+.faq-question i {
+    transition: all 0.3s ease;
+    color: var(--teal);
+}
+
+.faq-question i.rotate-180 {
+    transform: rotate(180deg);
+    color: var(--indigo-dark);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: white;
+}
+
+.faq-answer div {
+    padding: 0 1.5rem 1.5rem;
+    color: var(--text-medium);
+    line-height: 1.6;
+}
+
+.faq-answer p {
+    margin: 0;
+    padding: 0;
+}
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timeline-item {
+        margin-bottom: 2rem;
+    }
+    
+    .tech-card {
+        margin-bottom: 1rem;
+    }
+    
+    .faq-question {
+        padding: 1rem;
+    }
+    
+    .faq-answer div {
+        padding: 0 1rem 1rem;
+    }
+}
+
+/* FAQ Specific Styles */
+.faq-section {
+    background: linear-gradient(to bottom, rgba(244, 237, 204, 0.8) 0%, var(--cream) 100%);
+    min-height: calc(100vh - 70px);
+}
+
+.faq-container {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.faq-item {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(95, 93, 156, 0.1);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    box-shadow: 0 4px 6px rgba(95, 93, 156, 0.15);
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+}
+
+.faq-question:hover {
+    background-color: rgba(97, 150, 166, 0.05);
+}
+
+.faq-question h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--indigo-dark);
+}
+
+.faq-question i {
+    transition: all 0.3s ease;
+    color: var(--teal);
+    font-size: 0.875rem;
+}
+
+.faq-question.active i {
+    transform: rotate(180deg);
+    color: var(--indigo-dark);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: white;
+}
+
+.faq-answer div {
+    padding: 0 1.5rem 1.5rem;
+    color: var(--text-medium);
+    line-height: 1.6;
+}
+
+.faq-answer p {
+    margin: 0;
+    padding: 0;
+}
+
+.faq-answer.active {
+    max-height: 500px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .faq-question {
+        padding: 1rem;
+    }
+    
+    .faq-question h3 {
+        font-size: 1rem;
+    }
+    
+    .faq-answer div {
+        padding: 0 1rem 1rem;
+        font-size: 0.9375rem;
+    }
+}

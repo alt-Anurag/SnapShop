@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - SnapShop Visual Shopping Assistant</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script>
+        tailwind.config = {
+            important: true,
+            darkMode: 'class',
+            corePlugins: {
+                preflight: true,
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="bg-cream font-poppins faqs-page" style="padding-top: 70px;">
+
+    <nav class="glass-navbar fixed w-full z-50 top-0 left-0 right-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="font-semibold text-indigo-dark text-xl">SnapShop</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="https://snapshop-anurag.netlify.app/"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Home</a>
+                        <a href="behind_the_tech.html"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Behind
+                            the Tech</a>
+                        <a href="faqs.html"
+                            class="border-teal text-gray-900 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">FAQs</a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    <a href="#"
+                        class="text-gray-500 hover:text-indigo-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-user mr-1"></i> Log In
+                    </a>
+                    <a href="#"
+                        class="bg-indigo-dark text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-darker flex items-center">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Sign Up
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button"
+                        class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-indigo-dark hover:text-indigo-darker focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-menu hidden sm:hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="https://snapshop-anurag.netlify.app/"
+                    class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
+                <a href="behind-the-tech.html"
+                    class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Behind
+                    the Tech</a>
+                <a href="faqs.html"
+                    class="bg-teal-50 border-teal text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">FAQs</a>
+                <div class="border-t border-gray-200 pt-4 pb-3">
+                    <div class="space-y-1">
+                        <a href="#"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-user mr-2"></i> Log In
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Sign Up
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="faq-section py-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-indigo-dark mb-4">Frequently Asked Questions</h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Find answers to common questions about SnapShop's visual shopping assistant.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto">
+                <div class="faq-container space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>How does SnapShop work?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>SnapShop uses advanced computer vision and machine learning to analyze the images you upload. It identifies objects, patterns, and styles in your photos, then matches them with similar products from our database. You'll receive personalized recommendations based on your visual preferences.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>What types of images work best?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>For best results, use clear, well-lit photos with a single main subject. Images with minimal background clutter and good contrast tend to produce the most accurate matches. You can upload photos of clothing, accessories, home decor, or any other products you're interested in.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 3 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>Is my image data stored or used for other purposes?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>We respect your privacy. Images are processed temporarily to generate recommendations and are not stored long-term. We don't use your images for any other purpose beyond providing the shopping recommendations you request. For more details, please see our Privacy Policy.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>Can I search for products by color or pattern?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>Yes! SnapShop excels at recognizing colors, patterns, and textures. Upload a photo featuring the color scheme or pattern you like, and we'll find products with similar visual characteristics. You can also refine results by color after getting your initial recommendations.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 5 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>How do I purchase recommended products?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>When you find a product you like, click the "Click to Buy" button. This will take you directly to the retailer's website where you can complete your purchase. SnapShop doesn't handle transactions directly but connects you with trusted retailers.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 6 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>Why do I need to create an account?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>While you can use SnapShop without an account, creating one allows us to save your preferences and search history. This helps us provide better personalized recommendations over time. An account also lets you save favorite products and access them across devices.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 7 -->
+                    <div class="faq-item rounded-lg overflow-hidden shadow-sm animate-fadeInUp">
+                        <button class="faq-question w-full">
+                            <h3>What retailers do you work with?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div>
+                                <p>We partner with hundreds of retailers across fashion, home goods, electronics, and more. Our database includes products from major brands as well as unique items from smaller boutiques. We're constantly adding new partners to expand your shopping options.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <p class="text-gray-600 mb-6">Still have questions? We're here to help!</p>
+                    <a href="mailto:support@snapshop.com" class="bg-indigo-dark text-white px-6 py-3 rounded-lg hover:bg-indigo-darker transition duration-300 font-medium inline-flex items-center shadow-md">
+                        <i class="fas fa-envelope mr-2"></i> Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-indigo-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <span class="font-bold text-2xl">SnapShop</span>
+                    <p class="text-teal-light mt-2">Visual shopping powered by AI</p>
+                </div>
+                <div class="flex space-x-6 mb-6 md:mb-0">
+                    <a href="https://x.com/zeroideasyet" class="text-teal-light hover:text-white text-xl"
+                        title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/zeroideasyet/" class="text-teal-light hover:text-white text-xl"
+                        title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:anuragjha7516@gmail.com" class="text-teal-light hover:text-white text-xl"
+                        title="Email"><i class="fab fa-google"></i></a>
+                    <a href="https://github.com/alt-Anurag/SnapShop" class="text-teal-light hover:text-white text-xl"
+                        title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-teal-light mt-8 pt-8 text-sm text-teal-light text-center">
+                <p>© 2025 SnapShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

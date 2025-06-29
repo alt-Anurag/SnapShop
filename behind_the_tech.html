@@ -1,0 +1,365 @@
+<!-- behind-the-tech.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behind the Tech | SnapShop</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script>
+        tailwind.config = {
+            important: true,
+            darkMode: 'class',
+            corePlugins: {
+                preflight: true,
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="bg-cream font-poppins" style="padding-top: 70px;">
+
+    <nav class="glass-navbar fixed w-full z-50 top-0 left-0 right-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="index.html" class="font-semibold text-indigo-dark text-xl">SnapShop</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="index.html"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Home</a>
+                        <a href="behind-the-tech.html"
+                            class="border-teal text-gray-900 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">Behind the Tech</a>
+                        <a href="faqs.html"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-4 text-sm font-medium">FAQs</a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    <a href="#"
+                        class="text-gray-500 hover:text-indigo-dark px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-user mr-1"></i> Log In
+                    </a>
+                    <a href="#"
+                        class="bg-indigo-dark text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-darker flex items-center">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Sign Up
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button"
+                        class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-indigo-dark hover:text-indigo-darker focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-menu hidden sm:hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="index.html"
+                    class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
+                <a href="behind-the-tech.html"
+                    class="bg-teal-50 border-teal text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Behind the Tech</a>
+                <a href="faqs.html"
+                    class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">FAQs</a>
+                <div class="border-t border-gray-200 pt-4 pb-3">
+                    <div class="space-y-1">
+                        <a href="#"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-user mr-2"></i> Log In
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-indigo-dark hover:bg-teal-50">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Sign Up
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="md:hidden h-[70px]"></div>
+        <div class="container mx-auto px-4 pt-24 pb-12">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-indigo-dark mb-4">The Tech Behind SnapShop</h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Cutting-edge AI meets seamless user experience</p>
+                
+                <div class="mt-8 flex justify-center">
+                    <div class="bg-white rounded-xl shadow-lg p-6 max-w-2xl w-full">
+                        <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8">
+                            <div class="text-center">
+                                <div class="text-5xl font-bold text-teal mb-2 countup" data-count="40045">0</div>
+                                <p class="text-gray-600">Products in Database</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-5xl font-bold text-teal mb-2">95.7%</div>
+                                <p class="text-gray-600">Accuracy Rate</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-5xl font-bold text-teal mb-2">7.2s</div>
+                                <p class="text-gray-600">Avg. Response Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-teal-very-light">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-indigo-dark mb-12 text-center">Our Powerful Pipeline</h2>
+            
+            <div class="relative">
+                <!-- Timeline line -->
+                <div class="hidden lg:block absolute left-1/2 h-full w-1 bg-teal-light transform -translate-x-1/2"></div>
+                
+                <!-- Timeline items -->
+                <div class="space-y-16 lg:space-y-0">
+                    <!-- Step 1 -->
+                    <div class="lg:flex lg:items-center lg:justify-between lg:odd:flex-row-reverse lg:mb-16">
+                        <div class="lg:w-5/12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-indigo-dark text-white rounded-full w-10 h-10 flex items-center justify-center mr-4">1</div>
+                                    <h3 class="text-xl font-bold text-indigo-dark">Image Upload</h3>
+                                </div>
+                                <p class="text-gray-600">Users upload an image through our intuitive interface with drag-and-drop, file browsing, or direct camera access.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-5/12">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Image Upload" class="w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="lg:flex lg:items-center lg:justify-between lg:odd:flex-row-reverse lg:mb-16">
+                        <div class="lg:w-5/12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-indigo-dark text-white rounded-full w-10 h-10 flex items-center justify-center mr-4">2</div>
+                                    <h3 class="text-xl font-bold text-indigo-dark">AI Analysis</h3>
+                                </div>
+                                <p class="text-gray-600">Google's Gemini 2.5 - Flash model analyzes the image to generate a detailed description of the product, identifying key features, colors, and patterns.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-5/12">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="AI Analysis" class="w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="lg:flex lg:items-center lg:justify-between lg:odd:flex-row-reverse lg:mb-16">
+                        <div class="lg:w-5/12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-indigo-dark text-white rounded-full w-10 h-10 flex items-center justify-center mr-4">3</div>
+                                    <h3 class="text-xl font-bold text-indigo-dark">Vector Embedding</h3>
+                                </div>
+                                <p class="text-gray-600">Our custom CLIP model from Hugging Face converts the image into a 512-dimensional vector embedding that captures visual similarity.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-5/12">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Vector Embedding" class="w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="lg:flex lg:items-center lg:justify-between lg:odd:flex-row-reverse lg:mb-16">
+                        <div class="lg:w-5/12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-indigo-dark text-white rounded-full w-10 h-10 flex items-center justify-center mr-4">4</div>
+                                    <h3 class="text-xl font-bold text-indigo-dark">Database Search</h3>
+                                </div>
+                                <p class="text-gray-600">Using Supabase with pgvector extension, we perform a lightning-fast similarity search across our database of 40,000+ products to find the closest matches.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-5/12">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Database Search" class="w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 5 -->
+                    <div class="lg:flex lg:items-center lg:justify-between lg:odd:flex-row-reverse">
+                        <div class="lg:w-5/12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-indigo-dark text-white rounded-full w-10 h-10 flex items-center justify-center mr-4">5</div>
+                                    <h3 class="text-xl font-bold text-indigo-dark">Results Delivery</h3>
+                                </div>
+                                <p class="text-gray-600">The top 5 matching products are displayed with images, prices, and direct purchase links, all optimized for instant loading with our background preloading system.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-5/12">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Results Delivery" class="w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-indigo-dark mb-12 text-center">Our Tech Stack</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- Tech Item 1 -->
+                <div class="tech-card bg-white rounded-xl shadow-lg p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-teal-very-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-google text-4xl text-teal"></i>
+                    </div>
+                    <h3 class="font-bold text-indigo-dark mb-2">Gemini AI</h3>
+                    <p class="text-sm text-gray-600">Advanced image analysis</p>
+                </div>
+                
+                <!-- Tech Item 2 -->
+                <div class="tech-card bg-white rounded-xl shadow-lg p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-teal-very-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-js text-4xl text-teal"></i>
+                    </div>
+                    <h3 class="font-bold text-indigo-dark mb-2">JavaScript</h3>
+                    <p class="text-sm text-gray-600">Frontend logic</p>
+                </div>
+                
+                <!-- Tech Item 3 -->
+                <div class="tech-card bg-white rounded-xl shadow-lg p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-teal-very-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-hubspot text-4xl text-teal"></i>
+                    </div>
+                    <h3 class="font-bold text-indigo-dark mb-2">Hugging Face</h3>
+                    <p class="text-sm text-gray-600">CLIP embeddings</p>
+                </div>
+                
+                <!-- Tech Item 4 -->
+                <div class="tech-card bg-white rounded-xl shadow-lg p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-teal-very-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-database text-4xl text-teal"></i>
+                    </div>
+                    <h3 class="font-bold text-indigo-dark mb-2">Supabase</h3>
+                    <p class="text-sm text-gray-600">Vector database</p>
+                </div>
+                
+                <!-- Tech Item 5 -->
+                <div class="tech-card bg-white rounded-xl shadow-lg p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-teal-very-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-node-js text-4xl text-teal"></i>
+                    </div>
+                    <h3 class="font-bold text-indigo-dark mb-2">Netlify</h3>
+                    <p class="text-sm text-gray-600">Serverless functions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-indigo-dark text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-6">Why Our AI Stands Out</h2>
+                <p class="text-xl mb-8">SnapShop combines multiple cutting-edge technologies to deliver an unparalleled visual shopping experience that understands what you're looking for, even when you can't describe it in words.</p>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-indigo-darker rounded-xl p-6">
+                        <div class="text-teal-light text-4xl mb-4">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Lightning Fast</h3>
+                        <p>Our background preloading system eliminates wait times, delivering results instantly when you're ready.</p>
+                    </div>
+                    
+                    <div class="bg-indigo-darker rounded-xl p-6">
+                        <div class="text-teal-light text-4xl mb-4">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Intelligent</h3>
+                        <p>Combines visual similarity with semantic understanding to find products that truly match your style.</p>
+                    </div>
+                    
+                    <div class="bg-indigo-darker rounded-xl p-6">
+                        <div class="text-teal-light text-4xl mb-4">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Comprehensive</h3>
+                        <p>Trained on a constantly updating database of over 40,000 products across multiple categories.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-indigo-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-left">
+                    <span class="font-bold text-2xl">SnapShop</span>
+                    <p class="text-teal-light mt-2">Visual shopping powered by AI</p>
+                </div>
+                <div class="flex space-x-6 mb-6 md:mb-0">
+                    <a href="https://x.com/zeroideasyet" class="text-teal-light hover:text-white text-xl"
+                        title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/zeroideasyet/" class="text-teal-light hover:text-white text-xl"
+                        title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:anuragjha7516@gmail.com" class="text-teal-light hover:text-white text-xl"
+                        title="Email"><i class="fab fa-google"></i></a>
+                    <a href="https://github.com/alt-Anurag/SnapShop" class="text-teal-light hover:text-white text-xl"
+                        title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-teal-light mt-8 pt-8 text-sm text-teal-light text-center">
+                <p>© 2025 SnapShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Count up animation
+        document.addEventListener("DOMContentLoaded", function() {
+            const countUpElements = document.querySelectorAll('.countup');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        const count = parseInt(target.getAttribute('data-count'));
+                        const duration = 2000; // 2 seconds
+                        const step = count / (duration / 16); // 60fps
+                        
+                        let current = 0;
+                        const timer = setInterval(() => {
+                            current += step;
+                            if (current >= count) {
+                                clearInterval(timer);
+                                current = count;
+                            }
+                            target.textContent = Math.floor(current).toLocaleString();
+                        }, 16);
+                        
+                        observer.unobserve(target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            countUpElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>
