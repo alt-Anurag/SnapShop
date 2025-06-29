@@ -564,3 +564,117 @@ input[type="file"] {
         font-size: 0.9375rem;
     }
 }
+
+/* FAQ Specific Styles */
+.faq-section {
+    background: linear-gradient(to bottom, rgba(244, 237, 204, 0.8) 0%, var(--cream) 100%);
+    min-height: calc(100vh - 70px);
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+.faq-container {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.faq-item {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(95, 93, 156, 0.08);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    border: 1px solid rgba(97, 150, 166, 0.15);
+}
+
+.faq-item:hover {
+    box-shadow: 0 8px 25px rgba(95, 93, 156, 0.12);
+    transform: translateY(-2px);
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.faq-question:hover {
+    background-color: rgba(97, 150, 166, 0.03);
+}
+
+.faq-question h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--indigo-dark);
+    text-align: left;
+}
+
+.faq-question i {
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    color: var(--teal);
+    font-size: 0.875rem;
+    margin-left: 1rem;
+}
+
+.faq-question.active i {
+    transform: rotate(180deg);
+    color: var(--indigo-dark);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.faq-answer div {
+    padding: 0 1.5rem;
+    color: var(--text-medium);
+    line-height: 1.7;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.faq-answer.active {
+    max-height: 500px;
+}
+
+.faq-answer.active div {
+    opacity: 1;
+    transform: translateY(0);
+    padding-bottom: 1.5rem;
+    transition-delay: 0.15s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .faq-section {
+        padding-top: 1rem;
+    }
+    
+    .faq-question {
+        padding: 1.25rem;
+    }
+    
+    .faq-question h3 {
+        font-size: 1rem;
+    }
+    
+    .faq-answer div {
+        padding: 0 1.25rem;
+        font-size: 0.9375rem;
+    }
+    
+    .faq-answer.active div {
+        padding-bottom: 1.25rem;
+    }
+}
