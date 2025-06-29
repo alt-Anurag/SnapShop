@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SnapShop - Visual Shopping Assistant</title>
@@ -54,19 +53,19 @@
                 </div>
                 <div class="-mr-2 flex items-center sm:hidden">
                     <button type="button"
-                        class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-indigo-dark hover:text-indigo-darker focus:outline-none">
+                        class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-indigo-dark hover:text-indigo-darker focus:outline-none"
+                        aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-
-        <div class="mobile-menu hidden sm:hidden">
+        <div class="mobile-menu hidden sm:hidden" id="mobile-menu" aria-hidden="true">
             <div class="pt-2 pb-3 space-y-1">
                 <a href="https://snapshop-anurag.netlify.app/"
                     class="bg-teal-50 border-teal text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
-                <a href="behind-the-tech.html"
+                <a href="behind_the_tech.html"
                     class="border-transparent text-gray-500 hover:bg-teal-50 hover:border-gray-300 hover:text-indigo-dark block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Behind
                     the Tech</a>
                 <a href="faqs.html"
