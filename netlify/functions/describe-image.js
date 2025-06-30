@@ -29,7 +29,7 @@ exports.handler = async (event) => {
         {
           parts: [
             {
-              text: "Describe this image in exactly one line at the top. Then using numbered bullet points, focus on products, clothes, objects and their colors, styles and distinct characteristics that would be relevant for shopping in short. Do not include any markdown formatting like bold fonts, or anything at all",
+              text: "Describe this image in exactly one line at the top. Then using numbered bullet points, focus on products, clothes, objects and their colors, styles and distinct characteristics that would be relevant for shopping in short. Do not include any markdown formatting like bold fonts, or anything at all. Ensure to have maximum 7 points in any case, and focuss on product details so it makes it asier for user's to later search for these products.",
             },
             ...imageParts,
           ],
