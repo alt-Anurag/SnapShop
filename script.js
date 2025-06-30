@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   sampleBtn.addEventListener("click", async () => {
     previewImage.src =
-      "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+      "https://jsnbscsxsqrrdgllgttw.supabase.co/storage/v1/object/public/uploads//sample.jpg";
     showPreview();
 
     detectedItems.innerHTML = `
