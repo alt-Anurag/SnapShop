@@ -1,26 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // ==================== MOBILE MENU FIXES ====================
   const mobileMenuButton = document.querySelector(".mobile-menu-button");
   const mobileMenu = document.querySelector(".mobile-menu");
 
-  // Improved mobile menu toggle
   mobileMenuButton.addEventListener("click", function (e) {
     e.stopPropagation();
     mobileMenu.classList.toggle("hidden");
     mobileMenu.classList.toggle("active");
 
-    // Toggle body scroll
     document.body.style.overflow = mobileMenu.classList.contains("active")
       ? "hidden"
       : "";
 
-    // Update ARIA attributes
     const isExpanded = mobileMenu.classList.contains("active");
     this.setAttribute("aria-expanded", isExpanded);
     mobileMenu.setAttribute("aria-hidden", !isExpanded);
   });
 
-  // Close menu when clicking outside
   document.addEventListener("click", function (e) {
     if (
       !mobileMenu.contains(e.target) &&
@@ -34,12 +29,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Prevent clicks inside menu from closing it
   mobileMenu.addEventListener("click", function (e) {
     e.stopPropagation();
   });
 
-  // Close menu when a menu item is clicked (optional)
   document.querySelectorAll(".mobile-menu a").forEach((item) => {
     item.addEventListener("click", () => {
       mobileMenu.classList.add("hidden");
@@ -49,9 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.style.overflow = "";
     });
   });
-  // ==================== END MOBILE MENU FIXES ====================
 
-  // ==================== REST OF YOUR EXISTING CODE ====================
   function adjustViewport() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
@@ -69,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", adjustViewport);
   adjustViewport();
 
-  // File upload functionality
   const uploadContainer = document.getElementById("upload-container");
   const fileInput = document.getElementById("file-input");
   const browseBtn = document.getElementById("browse-btn");
@@ -84,7 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "recommendations-section"
   );
 
-  // API Configuration
   const API_ENDPOINT = "/.netlify/functions/describe-image";
   const RECOMMENDATIONS_ENDPOINT = "/.netlify/functions/recommend-products";
 
@@ -561,7 +550,6 @@ document.addEventListener("DOMContentLoaded", function () {
           const faqItem = question.parentElement;
           const answer = question.nextElementSibling;
 
-          // Close all other FAQs
           faqQuestions.forEach((q) => {
             if (q !== question) {
               q.classList.remove("active");
@@ -569,11 +557,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           });
 
-          // Toggle current FAQ
           question.classList.toggle("active");
           answer.classList.toggle("active");
 
-          // Smooth scroll for mobile to ensure visibility
           if (window.innerWidth < 768 && answer.classList.contains("active")) {
             setTimeout(() => {
               faqItem.scrollIntoView({
@@ -585,7 +571,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
 
-      // Initialize animations for FAQ items
       const animateFAQItems = () => {
         const faqItems = document.querySelectorAll(".faq-item");
         const observer = new IntersectionObserver(
@@ -612,7 +597,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// FAQ functionality
 document.addEventListener("DOMContentLoaded", function () {
   if (document.querySelector(".faqs-page")) {
     const faqQuestions = document.querySelectorAll(".faq-question");
@@ -622,7 +606,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const faqItem = question.parentElement;
         const answer = question.nextElementSibling;
 
-        // Close all other FAQs
         faqQuestions.forEach((q) => {
           if (q !== question) {
             q.classList.remove("active");
@@ -630,11 +613,9 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
 
-        // Toggle current FAQ
         question.classList.toggle("active");
         answer.classList.toggle("active");
 
-        // Smooth scroll for mobile to ensure visibility
         if (window.innerWidth < 768 && answer.classList.contains("active")) {
           setTimeout(() => {
             faqItem.scrollIntoView({
@@ -646,7 +627,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-    // Initialize animations for FAQ items
     const animateFAQItems = () => {
       const faqItems = document.querySelectorAll(".faq-item");
       const observer = new IntersectionObserver(
@@ -662,7 +642,6 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       faqItems.forEach((item, index) => {
-        // Add delay based on index for staggered animation
         item.style.animationDelay = `${index * 0.1}s`;
         observer.observe(item);
       });
