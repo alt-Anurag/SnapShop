@@ -294,15 +294,16 @@ document.addEventListener("DOMContentLoaded", function () {
       recommendationsContainer.innerHTML = `
                 <div class="col-span-full text-center py-8">
                     <p class="text-gray-600 mb-2">No matching products found</p>
-                    <p class="text-sm text-gray-500 mb-1">Try clicking "Find Matching Products" again.</p>
+                    <p class="text-sm text-gray-500 mb-1">Tip: Try clicking "Find Matching Products" again.</p>
                     <div class="text-sm text-gray-400 mt-4 space-y-1">
                       <p class="font-medium">If the issue keeps popping up, it might be because:</p>
                       <ul class="list-disc list-inside text-left inline-block text-gray-400">
-                        <li>Try doing a hard refresh on this webpage.</li>
+                        <li>Your image is out of focus, too complex or has too many cluttered items in one frame.</li>
                         <li>The backend needs a moment to warm up (free-tier cold start issues— student struggles 😅).</li>
-                        <li>The product database on the backend is still growing, and some items might not be listed yet due to free-tier data limits.</li>
+                        <li>The product database is still growing, some items might not be listed yet due to free-tier data limits.</li>
+                        <li>Try doing a hard refresh on this webpage, only if you've already tried the tip above.</li>
                       </ul>
-                      <p class="italic mt-2">I'm constantly working on improving this — thanks for your patience!</p>
+                      <p class="font-bold mt-3">I'm constantly working on improving this — thanks for your patience!</p>
                     </div>
                 </div>
             `;
