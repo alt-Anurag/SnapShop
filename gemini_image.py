@@ -8,12 +8,12 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app) 
-genai.configure(api_key="AIzaSyAkWLp68hygPw0vLO14O1YYcPzSN49EHco")
+genai.configure(api_key="GEMINI_API_KEY")
 def describe_image(image_data):
     
     try:
         
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-3.5-flash')
         img_bytes = base64.b64decode(image_data)
         img_part = {
             "mime_type": "image/jpeg", 
